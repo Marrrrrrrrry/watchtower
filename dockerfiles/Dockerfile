@@ -1,5 +1,7 @@
-FROM --platform=$BUILDPLATFORM alpine:3.19.0 as alpine
+# 使用最新 Alpine 作为运行层，统一平台构建
+FROM --platform=$BUILDPLATFORM alpine:latest AS alpine
 
+# 安装证书与时区数据，确保运行期 TLS/时区可用
 RUN apk add --no-cache \
     ca-certificates \
     tzdata

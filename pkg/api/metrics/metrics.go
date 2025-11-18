@@ -1,7 +1,7 @@
 package metrics
 
 import (
-	"github.com/containrrr/watchtower/pkg/metrics"
+	"github.com/Marrrrrrrrry/watchtower/pkg/metrics"
 	"net/http"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"

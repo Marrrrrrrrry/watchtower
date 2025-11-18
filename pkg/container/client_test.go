@@ -1,15 +1,16 @@
 package container
 
 import (
-	"github.com/docker/docker/api/types/network"
+    "github.com/docker/docker/api/types/network"
 	"time"
 
-	"github.com/containrrr/watchtower/internal/util"
-	"github.com/containrrr/watchtower/pkg/container/mocks"
-	"github.com/containrrr/watchtower/pkg/filters"
-	t "github.com/containrrr/watchtower/pkg/types"
+	"github.com/Marrrrrrrrry/watchtower/internal/util"
+	"github.com/Marrrrrrrrry/watchtower/pkg/container/mocks"
+	"github.com/Marrrrrrrrry/watchtower/pkg/filters"
+	t "github.com/Marrrrrrrrry/watchtower/pkg/types"
 
-	"github.com/docker/docker/api/types"
+    "github.com/docker/docker/api/types"
+    contTypes "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/backend"
 	cli "github.com/docker/docker/client"
 	"github.com/docker/docker/errdefs"
@@ -270,25 +271,25 @@ var _ = Describe("the client", func() {
 					// API.ContainerExecCreate
 					ghttp.CombineHandlers(
 						ghttp.VerifyRequest("POST", HaveSuffix("containers/%v/exec", containerID)),
-						ghttp.VerifyJSONRepresenting(types.ExecConfig{
-							User:   user,
-							Detach: false,
-							Tty:    true,
-							Cmd: []string{
-								"sh",
-								"-c",
-								cmd,
-							},
-						}),
+                        ghttp.VerifyJSONRepresenting(contTypes.ExecOptions{
+                            User:   user,
+                            Detach: false,
+                            Tty:    true,
+                            Cmd: []string{
+                                "sh",
+                                "-c",
+                                cmd,
+                            },
+                        }),
 						ghttp.RespondWithJSONEncoded(http.StatusOK, types.IDResponse{ID: execID}),
 					),
 					// API.ContainerExecStart
 					ghttp.CombineHandlers(
 						ghttp.VerifyRequest("POST", HaveSuffix("exec/%v/start", execID)),
-						ghttp.VerifyJSONRepresenting(types.ExecStartCheck{
-							Detach: false,
-							Tty:    true,
-						}),
+                        ghttp.VerifyJSONRepresenting(contTypes.ExecStartOptions{
+                            Detach: false,
+                            Tty:    true,
+                        }),
 						ghttp.RespondWith(http.StatusOK, nil),
 					),
 					// API.ContainerExecInspect

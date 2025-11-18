@@ -9,9 +9,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/containrrr/watchtower/internal/flags"
-	"github.com/containrrr/watchtower/pkg/container"
-	"github.com/containrrr/watchtower/pkg/notifications"
+	"github.com/Marrrrrrrrry/watchtower/internal/flags"
+	"github.com/Marrrrrrrrry/watchtower/pkg/container"
+	"github.com/Marrrrrrrrry/watchtower/pkg/notifications"
 	"github.com/spf13/cobra"
 )
 

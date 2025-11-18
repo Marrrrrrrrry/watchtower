@@ -1,6 +1,7 @@
 build:
   main: ./main.go
   binary: watchtower
+  # 使用最新 Go 工具链
   goos:
     - linux
     - windows
@@ -36,10 +37,10 @@ dockers:
     goarm: ''
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - containrrr/watchtower:amd64-{{ .Version }}
-      - containrrr/watchtower:amd64-latest
-      - ghcr.io/containrrr/watchtower:amd64-{{ .Version }}
-      - ghcr.io/containrrr/watchtower:amd64-latest
+      - Marrrrrrrrry/watchtower:amd64-{{ .Version }}
+      - Marrrrrrrrry/watchtower:amd64-latest
+      - ghcr.io/Marrrrrrrrry/watchtower:amd64-{{ .Version }}
+      - ghcr.io/Marrrrrrrrry/watchtower:amd64-latest
     binaries:
       - watchtower
   - 
@@ -50,24 +51,24 @@ dockers:
     goarm: ''
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - containrrr/watchtower:i386-{{ .Version }}
-      - containrrr/watchtower:i386-latest
-      - ghcr.io/containrrr/watchtower:i386-{{ .Version }}
-      - ghcr.io/containrrr/watchtower:i386-latest
+      - Marrrrrrrrry/watchtower:i386-{{ .Version }}
+      - Marrrrrrrrry/watchtower:i386-latest
+      - ghcr.io/Marrrrrrrrry/watchtower:i386-{{ .Version }}
+      - ghcr.io/Marrrrrrrrry/watchtower:i386-latest
     binaries:
       - watchtower
   - 
     use_buildx: true
-    build_flag_templates: [ "--platform=linux/arm/v6" ]
+    build_flag_templates: [ "--platform=linux/arm/v7" ]
     goos: linux
     goarch: arm
     goarm: 6
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - containrrr/watchtower:armhf-{{ .Version }}
-      - containrrr/watchtower:armhf-latest
-      - ghcr.io/containrrr/watchtower:armhf-{{ .Version }}
-      - ghcr.io/containrrr/watchtower:armhf-latest
+      - Marrrrrrrrry/watchtower:armhf-{{ .Version }}
+      - Marrrrrrrrry/watchtower:armhf-latest
+      - ghcr.io/Marrrrrrrrry/watchtower:armhf-{{ .Version }}
+      - ghcr.io/Marrrrrrrrry/watchtower:armhf-latest
     binaries:
       - watchtower
   - 
@@ -78,9 +79,9 @@ dockers:
     goarm: ''
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - containrrr/watchtower:arm64v8-{{ .Version }}
-      - containrrr/watchtower:arm64v8-latest
-      - ghcr.io/containrrr/watchtower:arm64v8-{{ .Version }}
-      - ghcr.io/containrrr/watchtower:arm64v8-latest
+      - Marrrrrrrrry/watchtower:arm64v8-{{ .Version }}
+      - Marrrrrrrrry/watchtower:arm64v8-latest
+      - ghcr.io/Marrrrrrrrry/watchtower:arm64v8-{{ .Version }}
+      - ghcr.io/Marrrrrrrrry/watchtower:arm64v8-latest
     binaries:
       - watchtower

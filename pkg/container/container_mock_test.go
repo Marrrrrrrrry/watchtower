@@ -1,9 +1,10 @@
 package container
 
 import (
-	"github.com/docker/docker/api/types"
-	dockerContainer "github.com/docker/docker/api/types/container"
-	"github.com/docker/go-connections/nat"
+    "github.com/docker/docker/api/types"
+    dockerContainer "github.com/docker/docker/api/types/container"
+    "github.com/docker/go-connections/nat"
+    specs "github.com/moby/docker-image-spec/specs-go/v1"
 )
 
 type MockContainerUpdate func(*types.ContainerJSON, *types.ImageInspect)
@@ -20,10 +21,10 @@ func MockContainer(updates ...MockContainerUpdate) *Container {
 			Labels: map[string]string{},
 		},
 	}
-	image := types.ImageInspect{
-		ID:     "image_id",
-		Config: &dockerContainer.Config{},
-	}
+    image := types.ImageInspect{
+        ID:     "image_id",
+        Config: &specs.DockerOCIImageConfig{},
+    }
 
 	for _, update := range updates {
 		update(&containerInfo, &image)
