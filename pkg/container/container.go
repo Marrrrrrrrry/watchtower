@@ -2,20 +2,20 @@
 package container
 
 import (
-    "errors"
-    "fmt"
-    "strconv"
-    "strings"
-    "time"
+	"errors"
+	"fmt"
+	"strconv"
+	"strings"
+	"time"
 
-    "github.com/Marrrrrrrrry/watchtower/internal/util"
-    wt "github.com/Marrrrrrrrry/watchtower/pkg/types"
-    "github.com/sirupsen/logrus"
+	"github.com/Marrrrrrrrry/watchtower/internal/util"
+	wt "github.com/Marrrrrrrrry/watchtower/pkg/types"
+	"github.com/sirupsen/logrus"
 
-    "github.com/docker/docker/api/types"
-    dockercontainer "github.com/docker/docker/api/types/container"
-    "github.com/docker/go-connections/nat"
-    v1 "github.com/moby/docker-image-spec/specs-go/v1"
+	"github.com/docker/docker/api/types"
+	dockercontainer "github.com/docker/docker/api/types/container"
+	"github.com/docker/go-connections/nat"
+	v1 "github.com/moby/docker-image-spec/specs-go/v1"
 )
 
 // NewContainer returns a new Container instance instantiated with the
@@ -283,17 +283,17 @@ func (c Container) StopSignal() string {
 // started from. This function returns a ContainerConfig which contains just
 // the options overridden at runtime.
 func (c Container) GetCreateConfig() *dockercontainer.Config {
-    config := c.containerInfo.Config
-    hostConfig := c.containerInfo.HostConfig
-    ociImageConfig := c.imageInfo.Config
-    dockerImageConfig := convertImageConfig(ociImageConfig)
-    clearSimpleFields(config, dockerImageConfig, hostConfig)
-    clearEntrypointCmdIfDefault(config, dockerImageConfig)
-    clearHealthcheckDefaults(config, dockerImageConfig)
-    subtractRuntimeOverrides(config, dockerImageConfig)
-    adjustPorts(config, c)
-    config.Image = c.ImageName()
-    return config
+	config := c.containerInfo.Config
+	hostConfig := c.containerInfo.HostConfig
+	ociImageConfig := c.imageInfo.Config
+	dockerImageConfig := convertImageConfig(ociImageConfig)
+	clearSimpleFields(config, dockerImageConfig, hostConfig)
+	clearEntrypointCmdIfDefault(config, dockerImageConfig)
+	clearHealthcheckDefaults(config, dockerImageConfig)
+	subtractRuntimeOverrides(config, dockerImageConfig)
+	adjustPorts(config, c)
+	config.Image = c.ImageName()
+	return config
 }
 
 func clearSimpleFields(config *dockercontainer.Config, imageConfig *dockercontainer.Config, hostConfig *dockercontainer.HostConfig) {
@@ -344,75 +344,75 @@ func subtractRuntimeOverrides(config *dockercontainer.Config, imageConfig *docke
 }
 
 func adjustPorts(config *dockercontainer.Config, c Container) {
-    dockerImageConfig := convertImageConfig(c.imageInfo.Config)
-    for k := range config.ExposedPorts {
-        if _, ok := dockerImageConfig.ExposedPorts[k]; ok {
-            delete(config.ExposedPorts, k)
-        }
-    }
-    for p := range c.containerInfo.HostConfig.PortBindings {
-        config.ExposedPorts[p] = struct{}{}
-    }
+	dockerImageConfig := convertImageConfig(c.imageInfo.Config)
+	for k := range config.ExposedPorts {
+		if _, ok := dockerImageConfig.ExposedPorts[k]; ok {
+			delete(config.ExposedPorts, k)
+		}
+	}
+	for p := range c.containerInfo.HostConfig.PortBindings {
+		config.ExposedPorts[p] = struct{}{}
+	}
 }
 
 func convertImageConfig(ociConfig *v1.DockerOCIImageConfig) *dockercontainer.Config {
-    if ociConfig == nil {
-        return &dockercontainer.Config{}
-    }
-    var hc *dockercontainer.HealthConfig
-    if ociConfig.Healthcheck != nil {
-        hc = &dockercontainer.HealthConfig{
-            Test:        append([]string(nil), ociConfig.Healthcheck.Test...),
-            Interval:    durationOrZero(ociConfig.Healthcheck.Interval),
-            Timeout:     durationOrZero(ociConfig.Healthcheck.Timeout),
-            StartPeriod: durationOrZero(ociConfig.Healthcheck.StartPeriod),
-            Retries:     ociConfig.Healthcheck.Retries,
-        }
-    }
-    var exposed nat.PortSet
-    if ociConfig.ExposedPorts != nil {
-        exposed = make(nat.PortSet)
-        for port := range ociConfig.ExposedPorts {
-            exposed[nat.Port(port)] = struct{}{}
-        }
-    }
-    var vols map[string]struct{}
-    if ociConfig.Volumes != nil {
-        vols = make(map[string]struct{}, len(ociConfig.Volumes))
-        for k := range ociConfig.Volumes {
-            vols[k] = struct{}{}
-        }
-    }
+	if ociConfig == nil {
+		return &dockercontainer.Config{}
+	}
+	var hc *dockercontainer.HealthConfig
+	if ociConfig.Healthcheck != nil {
+		hc = &dockercontainer.HealthConfig{
+			Test:        append([]string(nil), ociConfig.Healthcheck.Test...),
+			Interval:    durationOrZero(ociConfig.Healthcheck.Interval),
+			Timeout:     durationOrZero(ociConfig.Healthcheck.Timeout),
+			StartPeriod: durationOrZero(ociConfig.Healthcheck.StartPeriod),
+			Retries:     ociConfig.Healthcheck.Retries,
+		}
+	}
+	var exposed nat.PortSet
+	if ociConfig.ExposedPorts != nil {
+		exposed = make(nat.PortSet)
+		for port := range ociConfig.ExposedPorts {
+			exposed[nat.Port(port)] = struct{}{}
+		}
+	}
+	var vols map[string]struct{}
+	if ociConfig.Volumes != nil {
+		vols = make(map[string]struct{}, len(ociConfig.Volumes))
+		for k := range ociConfig.Volumes {
+			vols[k] = struct{}{}
+		}
+	}
 
-    return &dockercontainer.Config{
-        WorkingDir:   ociConfig.WorkingDir,
-        User:         ociConfig.User,
-        Entrypoint:   append([]string(nil), ociConfig.Entrypoint...),
-        Cmd:          append([]string(nil), ociConfig.Cmd...),
-        Env:          append([]string(nil), ociConfig.Env...),
-        Labels:       cloneStringMap(ociConfig.Labels),
-        Volumes:      vols,
-        ExposedPorts: exposed,
-        Healthcheck:  hc,
-    }
+	return &dockercontainer.Config{
+		WorkingDir:   ociConfig.WorkingDir,
+		User:         ociConfig.User,
+		Entrypoint:   append([]string(nil), ociConfig.Entrypoint...),
+		Cmd:          append([]string(nil), ociConfig.Cmd...),
+		Env:          append([]string(nil), ociConfig.Env...),
+		Labels:       cloneStringMap(ociConfig.Labels),
+		Volumes:      vols,
+		ExposedPorts: exposed,
+		Healthcheck:  hc,
+	}
 }
 
 func durationOrZero(d time.Duration) time.Duration {
-    if d < 0 {
-        return 0
-    }
-    return d
+	if d < 0 {
+		return 0
+	}
+	return d
 }
 
 func cloneStringMap(in map[string]string) map[string]string {
-    if in == nil {
-        return nil
-    }
-    out := make(map[string]string, len(in))
-    for k, v := range in {
-        out[k] = v
-    }
-    return out
+	if in == nil {
+		return nil
+	}
+	out := make(map[string]string, len(in))
+	for k, v := range in {
+		out[k] = v
+	}
+	return out
 }
 
 // GetCreateHostConfig returns the container's current HostConfig with any links
