@@ -19,26 +19,33 @@ import (
 func Update(client container.Client, params types.UpdateParams) (types.Report, error) {
 	log.Debug("Checking containers for updated images")
 	progress := &session.Progress{}
-	staleCount := 0
-
 	if params.LifecycleHooks {
 		lifecycle.ExecutePreChecks(client, params)
 	}
-
 	containers, err := client.ListContainers(params.Filter)
 	if err != nil {
 		return nil, err
 	}
+	containers = scanAndMarkStale(containers, client, params, progress)
+	containers, err = sorter.SortByDependencies(containers)
+	if err != nil {
+		return nil, err
+	}
+	UpdateImplicitRestart(containers)
+	toUpdate := selectContainersToUpdate(containers, params, progress)
+	executeUpdate(toUpdate, client, params, progress)
+	if params.LifecycleHooks {
+		lifecycle.ExecutePostChecks(client, params)
+	}
+	return progress.Report(), nil
+}
 
-	staleCheckFailed := 0
-
+func scanAndMarkStale(containers []types.Container, client container.Client, params types.UpdateParams, progress *session.Progress) []types.Container {
 	for i, targetContainer := range containers {
 		stale, newestImage, err := client.IsContainerStale(targetContainer, params)
 		shouldUpdate := stale && !params.NoRestart && !targetContainer.IsMonitorOnly(params)
 		if err == nil && shouldUpdate {
-			// Check to make sure we have all the necessary information for recreating the container
 			err = targetContainer.VerifyConfiguration()
-			// If the image information is incomplete and trace logging is enabled, log it for further diagnosis
 			if err != nil && log.IsLevelEnabled(log.TraceLevel) {
 				imageInfo := targetContainer.ImageInfo()
 				log.Tracef("Image info: %#v", imageInfo)
@@ -48,50 +55,38 @@ func Update(client container.Client, params types.UpdateParams) (types.Report, e
 				}
 			}
 		}
-
 		if err != nil {
 			log.Infof("Unable to update container %q: %v. Proceeding to next.", targetContainer.Name(), err)
 			stale = false
-			staleCheckFailed++
 			progress.AddSkipped(targetContainer, err)
 		} else {
 			progress.AddScanned(targetContainer, newestImage)
 		}
 		containers[i].SetStale(stale)
-
-		if stale {
-			staleCount++
-		}
 	}
+	return containers
+}
 
-	containers, err = sorter.SortByDependencies(containers)
-	if err != nil {
-		return nil, err
-	}
-
-	UpdateImplicitRestart(containers)
-
-	var containersToUpdate []types.Container
+func selectContainersToUpdate(containers []types.Container, params types.UpdateParams, progress *session.Progress) []types.Container {
+	var res []types.Container
 	for _, c := range containers {
 		if !c.IsMonitorOnly(params) {
-			containersToUpdate = append(containersToUpdate, c)
+			res = append(res, c)
 			progress.MarkForUpdate(c.ID())
 		}
 	}
+	return res
+}
 
+func executeUpdate(containersToUpdate []types.Container, client container.Client, params types.UpdateParams, progress *session.Progress) {
 	if params.RollingRestart {
 		progress.UpdateFailed(performRollingRestart(containersToUpdate, client, params))
-	} else {
-		failedStop, stoppedImages := stopContainersInReversedOrder(containersToUpdate, client, params)
-		progress.UpdateFailed(failedStop)
-		failedStart := restartContainersInSortedOrder(containersToUpdate, client, params, stoppedImages)
-		progress.UpdateFailed(failedStart)
+		return
 	}
-
-	if params.LifecycleHooks {
-		lifecycle.ExecutePostChecks(client, params)
-	}
-	return progress.Report(), nil
+	failedStop, stoppedImages := stopContainersInReversedOrder(containersToUpdate, client, params)
+	progress.UpdateFailed(failedStop)
+	failedStart := restartContainersInSortedOrder(containersToUpdate, client, params, stoppedImages)
+	progress.UpdateFailed(failedStart)
 }
 
 func performRollingRestart(containers []types.Container, client container.Client, params types.UpdateParams) map[types.ContainerID]error {

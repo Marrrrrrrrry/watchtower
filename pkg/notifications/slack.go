@@ -3,9 +3,9 @@ package notifications
 import (
 	"strings"
 
+	t "github.com/Marrrrrrrrry/watchtower/pkg/types"
 	shoutrrrDisco "github.com/containrrr/shoutrrr/pkg/services/discord"
 	shoutrrrSlack "github.com/containrrr/shoutrrr/pkg/services/slack"
-	t "github.com/Marrrrrrrrry/watchtower/pkg/types"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

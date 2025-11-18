@@ -28,7 +28,7 @@ Watchtower will pull down your new image, gracefully shut down your existing con
 $ docker run --detach \
     --name watchtower \
     --volume /var/run/docker.sock:/var/run/docker.sock \
-    containrrr/watchtower
+    marrrrrrrrrry/watchtower
 ```
 
 Watchtower is intended to be used in homelabs, media centers, local dev environments, and similar. We do **not** recommend using Watchtower in a commercial or production environment. If that is you, you should be looking into using Kubernetes. If that feels like too big a step for you, please look into solutions like [MicroK8s](https://microk8s.io/) and [k3s](https://k3s.io/) that take away a lot of the toil of running a Kubernetes cluster. 
@@ -166,6 +166,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/testwill"><img src="https://avatars.githubusercontent.com/u/8717479?v=4?s=100" width="100px;" alt="guangwu"/><br /><sub><b>guangwu</b></sub></a><br /><a href="https://github.com/containrrr/watchtower/commits?author=testwill" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://hub.lol"><img src="https://avatars.githubusercontent.com/u/48992448?v=4?s=100" width="100px;" alt="Florian Hübner"/><br /><sub><b>Florian Hübner</b></sub></a><br /><a href="https://github.com/containrrr/watchtower/commits?author=nothub" title="Documentation">📖</a> <a href="https://github.com/containrrr/watchtower/commits?author=nothub" title="Code">💻</a></td>
       <td align="center"><a href="https://github.com/andriibratanin"><img src="https://avatars.githubusercontent.com/u/20169213?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Andrii Bratanin</b></sub></a><br /><a href="https://github.com/containrrr/watchtower/commits?author=andriibratanin" title="Documentation">📖</a></td>
+      <td align="center"><a href="https://github.com/Marrrrrrrrry"><img src="https://avatars.githubusercontent.com/u/34876935?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Marrrrrrrrry</b></sub></a><br /><a href="https://github.com/containrrr/watchtower/commits?author=Marrrrrrrrry" title="Maintenance">🚧</a><a href="https://github.com/containrrr/watchtower/commits?author=Marrrrrrrrry" title="Tests">⚠️</a></td>
     </tr>
   </tbody>
 </table>

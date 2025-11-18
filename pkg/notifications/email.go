@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	shoutrrrSmtp "github.com/containrrr/shoutrrr/pkg/services/smtp"
 	t "github.com/Marrrrrrrrry/watchtower/pkg/types"
+	shoutrrrSmtp "github.com/containrrr/shoutrrr/pkg/services/smtp"
 	log "github.com/sirupsen/logrus"
 )
 

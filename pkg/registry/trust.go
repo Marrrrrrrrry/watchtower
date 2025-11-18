@@ -36,7 +36,7 @@ func EncodedEnvAuth() (string, error) {
 			Username: username,
 			Password: password,
 		}
-    
+
 		log.Debugf("Loaded auth credentials for registry user %s from environment", auth.Username)
 		// CREDENTIAL: Uncomment to log REPO_PASS environment variable
 		// log.Tracef("Using auth password %s", auth.Password)

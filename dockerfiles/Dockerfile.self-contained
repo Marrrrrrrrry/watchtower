@@ -6,7 +6,7 @@ FROM golang:1.25-alpine AS builder
 
 # use version (for example "v0.3.3") or "main"
 ARG WATCHTOWER_VERSION=main
-ARG RUN_TESTS=false
+ARG RUN_TESTS=true
 
 # 安装构建所需工具与证书，保证静态链接与 TLS 可用
 RUN apk add --no-cache \

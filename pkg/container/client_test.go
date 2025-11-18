@@ -1,7 +1,7 @@
 package container
 
 import (
-    "github.com/docker/docker/api/types/network"
+	"github.com/docker/docker/api/types/network"
 	"time"
 
 	"github.com/Marrrrrrrrry/watchtower/internal/util"
@@ -9,9 +9,9 @@ import (
 	"github.com/Marrrrrrrrry/watchtower/pkg/filters"
 	t "github.com/Marrrrrrrrry/watchtower/pkg/types"
 
-    "github.com/docker/docker/api/types"
-    contTypes "github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/backend"
+	contTypes "github.com/docker/docker/api/types/container"
 	cli "github.com/docker/docker/client"
 	"github.com/docker/docker/errdefs"
 	"github.com/onsi/gomega/gbytes"
@@ -271,25 +271,25 @@ var _ = Describe("the client", func() {
 					// API.ContainerExecCreate
 					ghttp.CombineHandlers(
 						ghttp.VerifyRequest("POST", HaveSuffix("containers/%v/exec", containerID)),
-                        ghttp.VerifyJSONRepresenting(contTypes.ExecOptions{
-                            User:   user,
-                            Detach: false,
-                            Tty:    true,
-                            Cmd: []string{
-                                "sh",
-                                "-c",
-                                cmd,
-                            },
-                        }),
+						ghttp.VerifyJSONRepresenting(contTypes.ExecOptions{
+							User:   user,
+							Detach: false,
+							Tty:    true,
+							Cmd: []string{
+								"sh",
+								"-c",
+								cmd,
+							},
+						}),
 						ghttp.RespondWithJSONEncoded(http.StatusOK, types.IDResponse{ID: execID}),
 					),
 					// API.ContainerExecStart
 					ghttp.CombineHandlers(
 						ghttp.VerifyRequest("POST", HaveSuffix("exec/%v/start", execID)),
-                        ghttp.VerifyJSONRepresenting(contTypes.ExecStartOptions{
-                            Detach: false,
-                            Tty:    true,
-                        }),
+						ghttp.VerifyJSONRepresenting(contTypes.ExecStartOptions{
+							Detach: false,
+							Tty:    true,
+						}),
 						ghttp.RespondWith(http.StatusOK, nil),
 					),
 					// API.ContainerExecInspect

@@ -6,7 +6,7 @@ FROM golang:1.25-alpine AS builder
 
 # use version (for example "v0.3.3") or "main"
 ARG WATCHTOWER_VERSION=main
-ARG RUN_TESTS=false
+ARG RUN_TESTS=true
 
 # Pre download required modules to avoid redownloading at each build thanks to docker layer caching.
 # Copying go.mod and go.sum ensure to invalid the layer/build cache if there is a change in module requirement

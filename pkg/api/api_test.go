@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	token  = "123123123"
+	token = "123123123"
 )
 
 func TestAPI(t *testing.T) {
@@ -51,7 +51,7 @@ var _ = Describe("API", func() {
 
 			rec := httptest.NewRecorder()
 			req := httptest.NewRequest("GET", "/hello", nil)
-			req.Header.Set("Authorization", "Bearer " + token)
+			req.Header.Set("Authorization", "Bearer "+token)
 
 			handlerFunc(rec, req)
 
