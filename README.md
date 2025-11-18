@@ -6,15 +6,12 @@
   A process for automating Docker container base image updates.
   <br/><br/>
   
-  [![Circle CI](https://circleci.com/gh/containrrr/watchtower.svg?style=shield)](https://circleci.com/gh/containrrr/watchtower)
-  [![codecov](https://codecov.io/gh/containrrr/watchtower/branch/main/graph/badge.svg)](https://codecov.io/gh/containrrr/watchtower)
-  [![GoDoc](https://godoc.org/github.com/containrrr/watchtower?status.svg)](https://godoc.org/github.com/containrrr/watchtower)
-  [![Go Report Card](https://goreportcard.com/badge/github.com/containrrr/watchtower)](https://goreportcard.com/report/github.com/containrrr/watchtower)
-  [![latest version](https://img.shields.io/github/tag/containrrr/watchtower.svg)](https://github.com/containrrr/watchtower/releases)
-  [![Apache-2.0 License](https://img.shields.io/github/license/containrrr/watchtower.svg)](https://www.apache.org/licenses/LICENSE-2.0)
-  [![Codacy Badge](https://app.codacy.com/project/badge/Grade/1c48cfb7646d4009aa8c6f71287670b8)](https://www.codacy.com/gh/containrrr/watchtower/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=containrrr/watchtower&amp;utm_campaign=Badge_Grade)
-  [![All Contributors](https://img.shields.io/github/all-contributors/containrrr/watchtower)](#contributors)
-  [![Pulls from DockerHub](https://img.shields.io/docker/pulls/containrrr/watchtower.svg)](https://hub.docker.com/r/containrrr/watchtower)
+  [![Go Report Card](https://goreportcard.com/badge/github.com/Marrrrrrrrry/watchtower)](https://goreportcard.com/report/github.com/Marrrrrrrrry/watchtower)
+  [![Latest Version](https://img.shields.io/github/tag/Marrrrrrrrry/watchtower.svg)](https://github.com/Marrrrrrrrry/watchtower/releases)
+  [![License](https://img.shields.io/github/license/Marrrrrrrrry/watchtower.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+  [![Codacy Badge](https://app.codacy.com/project/badge/Grade/31e175794b644518813afe567570e354)](https://app.codacy.com/gh/Marrrrrrrrry/watchtower/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+  [![Docker Pulls](https://img.shields.io/docker/pulls/marrrrrrrrry/watchtower.svg)](https://hub.docker.com/r/marrrrrrrrry/watchtower)
+  [![Go Reference](https://pkg.go.dev/badge/github.com/Marrrrrrrrry/watchtower.svg)](https://pkg.go.dev/github.com/Marrrrrrrrry/watchtower)
 
 </div>
 
