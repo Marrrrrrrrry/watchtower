@@ -12,15 +12,15 @@ import (
 	wt "github.com/Marrrrrrrrry/watchtower/pkg/types"
 	"github.com/sirupsen/logrus"
 
-	"github.com/docker/docker/api/types"
 	dockercontainer "github.com/docker/docker/api/types/container"
+	imageTypes "github.com/docker/docker/api/types/image"
 	"github.com/docker/go-connections/nat"
 	v1 "github.com/moby/docker-image-spec/specs-go/v1"
 )
 
 // NewContainer returns a new Container instance instantiated with the
 // specified ContainerInfo and ImageInfo structs.
-func NewContainer(containerInfo *types.ContainerJSON, imageInfo *types.ImageInspect) *Container {
+func NewContainer(containerInfo *dockercontainer.InspectResponse, imageInfo *imageTypes.InspectResponse) *Container {
 	return &Container{
 		containerInfo: containerInfo,
 		imageInfo:     imageInfo,
@@ -32,8 +32,8 @@ type Container struct {
 	LinkedToRestarting bool
 	Stale              bool
 
-	containerInfo *types.ContainerJSON
-	imageInfo     *types.ImageInspect
+	containerInfo *dockercontainer.InspectResponse
+	imageInfo     *imageTypes.InspectResponse
 }
 
 // IsLinkedToRestarting returns the current value of the LinkedToRestarting field for the container
@@ -57,7 +57,7 @@ func (c *Container) SetStale(value bool) {
 }
 
 // ContainerInfo fetches JSON info for the container
-func (c Container) ContainerInfo() *types.ContainerJSON {
+func (c Container) ContainerInfo() *dockercontainer.InspectResponse {
 	return c.containerInfo
 }
 
@@ -190,7 +190,7 @@ func (c Container) Links() []string {
 		return links
 	}
 
-	if (c.containerInfo != nil) && (c.containerInfo.HostConfig != nil) {
+	if c.containerInfo != nil && c.containerInfo.HostConfig != nil {
 		for _, link := range c.containerInfo.HostConfig.Links {
 			name := strings.Split(link, ":")[0]
 			links = append(links, name)
@@ -436,7 +436,7 @@ func (c Container) HasImageInfo() bool {
 }
 
 // ImageInfo fetches the ImageInspect data of the current container
-func (c Container) ImageInfo() *types.ImageInspect {
+func (c Container) ImageInfo() *imageTypes.InspectResponse {
 	return c.imageInfo
 }
 

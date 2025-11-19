@@ -20,11 +20,11 @@ var _ = Describe("the helpers", func() {
 		})
 		It("should return index.docker.io for image refs with no explicit registry", func() {
 			Expect(GetRegistryAddress("watchtower")).To(Equal("index.docker.io"))
-            Expect(GetRegistryAddress("marrrrrrrrry/watchtower")).To(Equal("index.docker.io"))
+			Expect(GetRegistryAddress("marrrrrrrrry/watchtower")).To(Equal("index.docker.io"))
 		})
 		It("should return index.docker.io for image refs with docker.io domain", func() {
 			Expect(GetRegistryAddress("docker.io/watchtower")).To(Equal("index.docker.io"))
-            Expect(GetRegistryAddress("docker.io/marrrrrrrrry/watchtower")).To(Equal("index.docker.io"))
+			Expect(GetRegistryAddress("docker.io/marrrrrrrrry/watchtower")).To(Equal("index.docker.io"))
 		})
 		It("should return the host if passed an image name containing a local host", func() {
 			Expect(GetRegistryAddress("henk:80/watchtower")).To(Equal("henk:80"))

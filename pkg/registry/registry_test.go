@@ -13,7 +13,7 @@ var _ = Describe("Registry", func() {
 	Describe("WarnOnAPIConsumption", func() {
 		When("Given a container with an image from ghcr.io", func() {
 			It("should want to warn", func() {
-                Expect(testContainerWithImage("ghcr.io/marrrrrrrrry/watchtower")).To(BeTrue())
+				Expect(testContainerWithImage("ghcr.io/marrrrrrrrry/watchtower")).To(BeTrue())
 			})
 		})
 		When("Given a container with an image implicitly from dockerhub", func() {

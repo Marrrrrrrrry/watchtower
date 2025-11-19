@@ -13,6 +13,7 @@ import (
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/versions"
 	sdkClient "github.com/docker/docker/client"
+	"github.com/docker/docker/errdefs"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/Marrrrrrrrry/watchtower/pkg/registry"
@@ -83,7 +84,7 @@ const (
 )
 
 type dockerClient struct {
-	api sdkClient.CommonAPIClient
+	api sdkClient.APIClient
 	ClientOptions
 }
 
@@ -178,7 +179,7 @@ func (client dockerClient) GetContainer(containerID t.ContainerID) (t.Container,
 		}
 	}
 
-	imageInfo, _, err := client.api.ImageInspectWithRaw(bg, containerInfo.Image)
+	imageInfo, err := client.api.ImageInspect(bg, containerInfo.Image)
 	if err != nil {
 		log.Warnf("Failed to retrieve container image info: %v", err)
 		return &Container{containerInfo: &containerInfo, imageInfo: nil}, nil
@@ -213,7 +214,7 @@ func (client dockerClient) StopContainer(c t.Container, timeout time.Duration) e
 		log.Debugf("Removing container %s", shortID)
 
 		if err := client.api.ContainerRemove(bg, idStr, container.RemoveOptions{Force: true, RemoveVolumes: client.RemoveVolumes}); err != nil {
-			if sdkClient.IsErrNotFound(err) {
+			if errdefs.IsNotFound(err) {
 				log.Debugf("Container %s not found, skipping removal.", shortID)
 				return nil
 			}
@@ -238,7 +239,7 @@ func (client dockerClient) waitForRemovalOrTimeout(bg context.Context, id string
 			return fmt.Errorf("容器未在规定时间内移除: %s", t.ContainerID(id).ShortID())
 		default:
 			if _, err := client.api.ContainerInspect(bg, id); err != nil {
-				if sdkClient.IsErrNotFound(err) {
+				if errdefs.IsNotFound(err) {
 					return nil
 				}
 				return err
@@ -354,10 +355,10 @@ func (client dockerClient) IsContainerStale(container t.Container, params t.Upda
 }
 
 func (client dockerClient) HasNewImage(ctx context.Context, container t.Container) (hasNew bool, latestImage t.ImageID, err error) {
-	currentImageID := t.ImageID(container.ContainerInfo().ContainerJSONBase.Image)
+	currentImageID := t.ImageID(container.ContainerInfo().Image)
 	imageName := container.ImageName()
 
-	newImageInfo, _, err := client.api.ImageInspectWithRaw(ctx, imageName)
+	newImageInfo, err := client.api.ImageInspect(ctx, imageName)
 	if err != nil {
 		return false, currentImageID, err
 	}

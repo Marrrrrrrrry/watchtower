@@ -1,6 +1,7 @@
 package container
 
 import (
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/network"
 	"time"
 
@@ -9,7 +10,6 @@ import (
 	"github.com/Marrrrrrrrry/watchtower/pkg/filters"
 	t "github.com/Marrrrrrrrry/watchtower/pkg/types"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/backend"
 	contTypes "github.com/docker/docker/api/types/container"
 	cli "github.com/docker/docker/client"
@@ -79,8 +79,8 @@ var _ = Describe("the client", func() {
 	When("removing a running container", func() {
 		When("the container still exist after stopping", func() {
 			It("should attempt to remove the container", func() {
-				container := MockContainer(WithContainerState(types.ContainerState{Running: true}))
-				containerStopped := MockContainer(WithContainerState(types.ContainerState{Running: false}))
+				container := MockContainer(WithContainerState(contTypes.State{Running: true}))
+				containerStopped := MockContainer(WithContainerState(contTypes.State{Running: false}))
 
 				cid := container.ContainerInfo().ID
 				mockServer.AppendHandlers(
@@ -95,7 +95,7 @@ var _ = Describe("the client", func() {
 		})
 		When("the container does not exist after stopping", func() {
 			It("should not cause an error", func() {
-				container := MockContainer(WithContainerState(types.ContainerState{Running: true}))
+				container := MockContainer(WithContainerState(contTypes.State{Running: true}))
 
 				cid := container.ContainerInfo().ID
 				mockServer.AppendHandlers(
@@ -177,7 +177,7 @@ var _ = Describe("the client", func() {
 				}
 				containers, err := client.ListContainers(filters.WatchtowerContainersFilter)
 				Expect(err).NotTo(HaveOccurred())
-                Expect(containers).To(ConsistOf(withContainerImageName(Equal("marrrrrrrrry/watchtower:latest"))))
+				Expect(containers).To(ConsistOf(withContainerImageName(Equal("marrrrrrrrry/watchtower:latest"))))
 			})
 		})
 		When(`include stopped is enabled`, func() {
@@ -281,7 +281,7 @@ var _ = Describe("the client", func() {
 								cmd,
 							},
 						}),
-						ghttp.RespondWithJSONEncoded(http.StatusOK, types.IDResponse{ID: execID}),
+						ghttp.RespondWithJSONEncoded(http.StatusOK, contTypes.ExecCreateResponse{ID: execID}),
 					),
 					// API.ContainerExecStart
 					ghttp.CombineHandlers(

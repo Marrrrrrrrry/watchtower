@@ -13,6 +13,7 @@ import (
 	t "github.com/Marrrrrrrrry/watchtower/pkg/types"
 
 	types "github.com/docker/docker/api/types"
+	contTypes "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	imageTypes "github.com/docker/docker/api/types/image"
 	O "github.com/onsi/gomega"
@@ -166,7 +167,7 @@ func getContainerHandler(containerId string, responseHandler http.HandlerFunc) h
 }
 
 // GetContainerHandler mocks the GET containers/{id}/json endpoint
-func GetContainerHandler(containerID string, containerInfo *types.ContainerJSON) http.HandlerFunc {
+func GetContainerHandler(containerID string, containerInfo *contTypes.InspectResponse) http.HandlerFunc {
 	responseHandler := containerNotFoundResponse(containerID)
 	if containerInfo != nil {
 		responseHandler = ghttp.RespondWithJSONEncoded(http.StatusOK, containerInfo)
@@ -175,7 +176,7 @@ func GetContainerHandler(containerID string, containerInfo *types.ContainerJSON)
 }
 
 // GetImageHandler mocks the GET images/{id}/json endpoint
-func GetImageHandler(imageInfo *types.ImageInspect) http.HandlerFunc {
+func GetImageHandler(imageInfo *imageTypes.InspectResponse) http.HandlerFunc {
 	return getImageHandler(t.ImageID(imageInfo.ID), ghttp.RespondWithJSONEncoded(http.StatusOK, imageInfo))
 }
 
