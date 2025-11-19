@@ -177,7 +177,7 @@ var _ = Describe("the client", func() {
 				}
 				containers, err := client.ListContainers(filters.WatchtowerContainersFilter)
 				Expect(err).NotTo(HaveOccurred())
-				Expect(containers).To(ConsistOf(withContainerImageName(Equal("containrrr/watchtower:latest"))))
+                Expect(containers).To(ConsistOf(withContainerImageName(Equal("marrrrrrrrry/watchtower:latest"))))
 			})
 		})
 		When(`include stopped is enabled`, func() {

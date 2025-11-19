@@ -11,7 +11,7 @@ build:
     - arm
     - arm64
   ldflags:
-    - -s -w -X github.com/containrrr/watchtower/internal/meta.Version={{.Version}}
+    - -s -w -X github.com/Marrrrrrrrry/watchtower/internal/meta.Version={{.Version}}
 archives:
   - 
     name_template: "{{.ProjectName}}_{{.Os}}_{{.Arch}}"
@@ -37,10 +37,10 @@ dockers:
     goarm: ''
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - Marrrrrrrrry/watchtower:amd64-{{ .Version }}
-      - Marrrrrrrrry/watchtower:amd64-latest
-      - ghcr.io/Marrrrrrrrry/watchtower:amd64-{{ .Version }}
-      - ghcr.io/Marrrrrrrrry/watchtower:amd64-latest
+      - marrrrrrrrry/watchtower:amd64-{{ .Version }}
+      - marrrrrrrrry/watchtower:amd64-latest
+      - ghcr.io/marrrrrrrrry/watchtower:amd64-{{ .Version }}
+      - ghcr.io/marrrrrrrrry/watchtower:amd64-latest
     binaries:
       - watchtower
   - 
@@ -51,10 +51,10 @@ dockers:
     goarm: ''
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - Marrrrrrrrry/watchtower:i386-{{ .Version }}
-      - Marrrrrrrrry/watchtower:i386-latest
-      - ghcr.io/Marrrrrrrrry/watchtower:i386-{{ .Version }}
-      - ghcr.io/Marrrrrrrrry/watchtower:i386-latest
+      - marrrrrrrrry/watchtower:i386-{{ .Version }}
+      - marrrrrrrrry/watchtower:i386-latest
+      - ghcr.io/marrrrrrrrry/watchtower:i386-{{ .Version }}
+      - ghcr.io/marrrrrrrrry/watchtower:i386-latest
     binaries:
       - watchtower
   - 
@@ -65,10 +65,10 @@ dockers:
     goarm: 6
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - Marrrrrrrrry/watchtower:armhf-{{ .Version }}
-      - Marrrrrrrrry/watchtower:armhf-latest
-      - ghcr.io/Marrrrrrrrry/watchtower:armhf-{{ .Version }}
-      - ghcr.io/Marrrrrrrrry/watchtower:armhf-latest
+      - marrrrrrrrry/watchtower:armhf-{{ .Version }}
+      - marrrrrrrrry/watchtower:armhf-latest
+      - ghcr.io/marrrrrrrrry/watchtower:armhf-{{ .Version }}
+      - ghcr.io/marrrrrrrrry/watchtower:armhf-latest
     binaries:
       - watchtower
   - 
@@ -79,9 +79,9 @@ dockers:
     goarm: ''
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - Marrrrrrrrry/watchtower:arm64v8-{{ .Version }}
-      - Marrrrrrrrry/watchtower:arm64v8-latest
-      - ghcr.io/Marrrrrrrrry/watchtower:arm64v8-{{ .Version }}
-      - ghcr.io/Marrrrrrrrry/watchtower:arm64v8-latest
+      - marrrrrrrrry/watchtower:arm64v8-{{ .Version }}
+      - marrrrrrrrry/watchtower:arm64v8-latest
+      - ghcr.io/marrrrrrrrry/watchtower:arm64v8-{{ .Version }}
+      - ghcr.io/marrrrrrrrry/watchtower:arm64v8-latest
     binaries:
       - watchtower

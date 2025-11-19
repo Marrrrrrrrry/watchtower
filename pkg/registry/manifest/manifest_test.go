@@ -19,24 +19,24 @@ func TestManifest(t *testing.T) {
 var _ = Describe("the manifest module", func() {
 	Describe("BuildManifestURL", func() {
 		It("should return a valid url given a fully qualified image", func() {
-			imageRef := "ghcr.io/containrrr/watchtower:mytag"
-			expected := "https://ghcr.io/v2/containrrr/watchtower/manifests/mytag"
+            imageRef := "ghcr.io/marrrrrrrrry/watchtower:mytag"
+            expected := "https://ghcr.io/v2/marrrrrrrrry/watchtower/manifests/mytag"
 
 			URL, err := buildMockContainerManifestURL(imageRef)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(URL).To(Equal(expected))
 		})
 		It("should assume Docker Hub for image refs with no explicit registry", func() {
-			imageRef := "containrrr/watchtower:latest"
-			expected := "https://index.docker.io/v2/containrrr/watchtower/manifests/latest"
+            imageRef := "marrrrrrrrry/watchtower:latest"
+            expected := "https://index.docker.io/v2/marrrrrrrrry/watchtower/manifests/latest"
 
 			URL, err := buildMockContainerManifestURL(imageRef)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(URL).To(Equal(expected))
 		})
 		It("should assume latest for image refs with no explicit tag", func() {
-			imageRef := "containrrr/watchtower"
-			expected := "https://index.docker.io/v2/containrrr/watchtower/manifests/latest"
+            imageRef := "marrrrrrrrry/watchtower"
+            expected := "https://index.docker.io/v2/marrrrrrrrry/watchtower/manifests/latest"
 
 			URL, err := buildMockContainerManifestURL(imageRef)
 			Expect(err).NotTo(HaveOccurred())

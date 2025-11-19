@@ -68,14 +68,14 @@ var _ = Describe("the auth module", func() {
 	Describe("GetAuthURL", func() {
 		It("should create a valid auth url object based on the challenge header supplied", func() {
 			challenge := `bearer realm="https://ghcr.io/token",service="ghcr.io",scope="repository:user/image:pull"`
-			imageRef, err := ref.ParseNormalizedNamed("containrrr/watchtower")
+            imageRef, err := ref.ParseNormalizedNamed("marrrrrrrrry/watchtower")
 			Expect(err).NotTo(HaveOccurred())
-			expected := &url.URL{
-				Host:     "ghcr.io",
-				Scheme:   "https",
-				Path:     "/token",
-				RawQuery: "scope=repository%3Acontainrrr%2Fwatchtower%3Apull&service=ghcr.io",
-			}
+            expected := &url.URL{
+                Host:     "ghcr.io",
+                Scheme:   "https",
+                Path:     "/token",
+                RawQuery: "scope=repository%3Amarrrrrrrrry%2Fwatchtower%3Apull&service=ghcr.io",
+            }
 
 			URL, err := auth.GetAuthURL(challenge, imageRef)
 			Expect(err).NotTo(HaveOccurred())
@@ -85,7 +85,7 @@ var _ = Describe("the auth module", func() {
 		When("given an invalid challenge header", func() {
 			It("should return an error", func() {
 				challenge := `bearer realm="https://ghcr.io/token"`
-				imageRef, err := ref.ParseNormalizedNamed("containrrr/watchtower")
+                imageRef, err := ref.ParseNormalizedNamed("marrrrrrrrry/watchtower")
 				Expect(err).NotTo(HaveOccurred())
 				URL, err := auth.GetAuthURL(challenge, imageRef)
 				Expect(err).To(HaveOccurred())
@@ -100,21 +100,21 @@ var _ = Describe("the auth module", func() {
 				Expect(getScopeFromImageAuthURL("index.docker.io/registry")).To(Equal("library/registry"))
 			})
 			It("should not include vanity hosts\"", func() {
-				Expect(getScopeFromImageAuthURL("docker.io/containrrr/watchtower")).To(Equal("containrrr/watchtower"))
-				Expect(getScopeFromImageAuthURL("index.docker.io/containrrr/watchtower")).To(Equal("containrrr/watchtower"))
+                Expect(getScopeFromImageAuthURL("docker.io/marrrrrrrrry/watchtower")).To(Equal("marrrrrrrrry/watchtower"))
+                Expect(getScopeFromImageAuthURL("index.docker.io/marrrrrrrrry/watchtower")).To(Equal("marrrrrrrrry/watchtower"))
 			})
 			It("should not destroy three segment image names\"", func() {
-				Expect(getScopeFromImageAuthURL("piksel/containrrr/watchtower")).To(Equal("piksel/containrrr/watchtower"))
-				Expect(getScopeFromImageAuthURL("ghcr.io/piksel/containrrr/watchtower")).To(Equal("piksel/containrrr/watchtower"))
+                Expect(getScopeFromImageAuthURL("piksel/marrrrrrrrry/watchtower")).To(Equal("piksel/marrrrrrrrry/watchtower"))
+                Expect(getScopeFromImageAuthURL("ghcr.io/piksel/marrrrrrrrry/watchtower")).To(Equal("piksel/marrrrrrrrry/watchtower"))
 			})
 			It("should not prepend library/ to image names if they're not on dockerhub", func() {
 				Expect(getScopeFromImageAuthURL("ghcr.io/watchtower")).To(Equal("watchtower"))
-				Expect(getScopeFromImageAuthURL("ghcr.io/containrrr/watchtower")).To(Equal("containrrr/watchtower"))
+                Expect(getScopeFromImageAuthURL("ghcr.io/marrrrrrrrry/watchtower")).To(Equal("marrrrrrrrry/watchtower"))
 			})
 		})
 		It("should not crash when an empty field is received", func() {
 			input := `bearer realm="https://ghcr.io/token",service="ghcr.io",scope="repository:user/image:pull",`
-			imageRef, err := ref.ParseNormalizedNamed("containrrr/watchtower")
+            imageRef, err := ref.ParseNormalizedNamed("marrrrrrrrry/watchtower")
 			Expect(err).NotTo(HaveOccurred())
 			res, err := auth.GetAuthURL(input, imageRef)
 			Expect(err).NotTo(HaveOccurred())
@@ -122,7 +122,7 @@ var _ = Describe("the auth module", func() {
 		})
 		It("should not crash when a field without a value is received", func() {
 			input := `bearer realm="https://ghcr.io/token",service="ghcr.io",scope="repository:user/image:pull",valuelesskey`
-			imageRef, err := ref.ParseNormalizedNamed("containrrr/watchtower")
+            imageRef, err := ref.ParseNormalizedNamed("marrrrrrrrry/watchtower")
 			Expect(err).NotTo(HaveOccurred())
 			res, err := auth.GetAuthURL(input, imageRef)
 			Expect(err).NotTo(HaveOccurred())
@@ -133,17 +133,17 @@ var _ = Describe("the auth module", func() {
 	Describe("GetChallengeURL", func() {
 		It("should create a valid challenge url object based on the image ref supplied", func() {
 			expected := url.URL{Host: "ghcr.io", Scheme: "https", Path: "/v2/"}
-			imageRef, _ := ref.ParseNormalizedNamed("ghcr.io/containrrr/watchtower:latest")
+            imageRef, _ := ref.ParseNormalizedNamed("ghcr.io/marrrrrrrrry/watchtower:latest")
 			Expect(auth.GetChallengeURL(imageRef)).To(Equal(expected))
 		})
 		It("should assume Docker Hub for image refs with no explicit registry", func() {
 			expected := url.URL{Host: "index.docker.io", Scheme: "https", Path: "/v2/"}
-			imageRef, _ := ref.ParseNormalizedNamed("containrrr/watchtower:latest")
+            imageRef, _ := ref.ParseNormalizedNamed("marrrrrrrrry/watchtower:latest")
 			Expect(auth.GetChallengeURL(imageRef)).To(Equal(expected))
 		})
 		It("should use index.docker.io if the image ref specifies docker.io", func() {
 			expected := url.URL{Host: "index.docker.io", Scheme: "https", Path: "/v2/"}
-			imageRef, _ := ref.ParseNormalizedNamed("docker.io/containrrr/watchtower:latest")
+            imageRef, _ := ref.ParseNormalizedNamed("docker.io/marrrrrrrrry/watchtower:latest")
 			Expect(auth.GetChallengeURL(imageRef)).To(Equal(expected))
 		})
 	})
