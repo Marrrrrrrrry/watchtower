@@ -8,18 +8,51 @@ before:
     - go generate ./...
 
 builds:
-  - id: watchtower
+  - id: watchtower-linux-amd64
     main: ./main.go
     binary: watchtower
-    # 使用最新 Go 工具链
     goos:
       - linux
+    goarch:
+      - amd64
+    ldflags:
+      - -s -w -X github.com/Marrrrrrrrry/watchtower/internal/meta.Version={{.Version}}
+  - id: watchtower-linux-386
+    main: ./main.go
+    binary: watchtower
+    goos:
+      - linux
+    goarch:
+      - 386
+    ldflags:
+      - -s -w -X github.com/Marrrrrrrrry/watchtower/internal/meta.Version={{.Version}}
+  - id: watchtower-linux-armv7
+    main: ./main.go
+    binary: watchtower
+    goos:
+      - linux
+    goarch:
+      - arm
+    goarm:
+      - 7
+    ldflags:
+      - -s -w -X github.com/Marrrrrrrrry/watchtower/internal/meta.Version={{.Version}}
+  - id: watchtower-linux-arm64
+    main: ./main.go
+    binary: watchtower
+    goos:
+      - linux
+    goarch:
+      - arm64
+    ldflags:
+      - -s -w -X github.com/Marrrrrrrrry/watchtower/internal/meta.Version={{.Version}}
+  - id: watchtower-windows-amd64
+    main: ./main.go
+    binary: watchtower
+    goos:
       - windows
     goarch:
       - amd64
-      - 386
-      - arm
-      - arm64
     ldflags:
       - -s -w -X github.com/Marrrrrrrrry/watchtower/internal/meta.Version={{.Version}}
 
@@ -56,7 +89,7 @@ dockers:
       - "marrrrrrrrry/watchtower:amd64-{{ .Tag }}"
       - "ghcr.io/marrrrrrrrry/watchtower:amd64-{{ .Tag }}"
     ids:
-      - watchtower
+      - watchtower-linux-amd64
   - use: buildx
     build_flag_templates: [ "--platform=linux/386" ]
     goos: linux
@@ -67,7 +100,7 @@ dockers:
       - "marrrrrrrrry/watchtower:i386-{{ .Tag }}"
       - "ghcr.io/marrrrrrrrry/watchtower:i386-{{ .Tag }}"
     ids:
-      - watchtower
+      - watchtower-linux-386
   - use: buildx
     build_flag_templates: [ "--platform=linux/arm/v7" ]
     goos: linux
@@ -78,7 +111,7 @@ dockers:
       - "marrrrrrrrry/watchtower:armhf-{{ .Tag }}"
       - "ghcr.io/marrrrrrrrry/watchtower:armhf-{{ .Tag }}"
     ids:
-      - watchtower
+      - watchtower-linux-armv7
   - use: buildx
     build_flag_templates: [ "--platform=linux/arm64/v8" ]
     goos: linux
@@ -89,7 +122,7 @@ dockers:
       - "marrrrrrrrry/watchtower:arm64v8-{{ .Tag }}"
       - "ghcr.io/marrrrrrrrry/watchtower:arm64v8-{{ .Tag }}"
     ids:
-      - watchtower
+      - watchtower-linux-arm64
 
   # 只有正式版才推送 latest
   - use: buildx
@@ -103,7 +136,7 @@ dockers:
       - "ghcr.io/marrrrrrrrry/watchtower:amd64-latest"
     skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
     ids:
-      - watchtower
+      - watchtower-linux-amd64
   - use: buildx
     build_flag_templates: [ "--platform=linux/386" ]
     goos: linux
@@ -115,7 +148,7 @@ dockers:
       - "ghcr.io/marrrrrrrrry/watchtower:i386-latest"
     skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
     ids:
-      - watchtower
+      - watchtower-linux-386
   - use: buildx
     build_flag_templates: [ "--platform=linux/arm/v7" ]
     goos: linux
@@ -127,7 +160,7 @@ dockers:
       - "ghcr.io/marrrrrrrrry/watchtower:armhf-latest"
     skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
     ids:
-      - watchtower
+      - watchtower-linux-armv7
   - use: buildx
     build_flag_templates: [ "--platform=linux/arm64/v8" ]
     goos: linux
@@ -139,7 +172,7 @@ dockers:
       - "ghcr.io/marrrrrrrrry/watchtower:arm64v8-latest"
     skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
     ids:
-      - watchtower
+      - watchtower-linux-arm64
 
 docker_manifests:
   - name_template: "marrrrrrrrry/watchtower:{{ .Tag }}"
