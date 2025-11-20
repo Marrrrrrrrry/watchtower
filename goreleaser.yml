@@ -1,87 +1,147 @@
-build:
-  main: ./main.go
-  binary: watchtower
-  # 使用最新 Go 工具链
-  goos:
-    - linux
-    - windows
-  goarch:
-    - amd64
-    - 386
-    - arm
-    - arm64
-  ldflags:
-    - -s -w -X github.com/Marrrrrrrrry/watchtower/internal/meta.Version={{.Version}}
+version: 2
+
+project_name: watchtower
+
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+
+builds:
+  - id: watchtower
+    main: ./main.go
+    binary: watchtower
+    # 使用最新 Go 工具链
+    goos:
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - 386
+      - arm
+      - arm64
+    ldflags:
+      - -s -w -X github.com/Marrrrrrrrry/watchtower/internal/meta.Version={{.Version}}
+
+release:
+  github:
+    owner: marrrrrrrrry
+    name: watchtower
+  draft: false
+  prerelease: auto
 archives:
-  - 
-    name_template: "{{.ProjectName}}_{{.Os}}_{{.Arch}}"
-    format: tar.gz
-    replacements:
-      arm: armhf
-      arm64: arm64v8
-      amd64: amd64
-      386: 386
-      darwin: macOS
-      linux: linux
+  - name_template: >-
+      {{- .ProjectName }}_
+      {{- if eq .Os "darwin" }}macOS
+      {{- else }}{{ .Os }}{{ end }}_
+      {{- if eq .Arch "arm" }}armhf
+      {{- else if eq .Arch "arm64" }}arm64v8
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+    formats: [tar.gz]
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [zip]
     files:
       - LICENSE.md
 dockers:
-  -
-    use_buildx: true
+  - use: buildx
     build_flag_templates: [ "--platform=linux/amd64" ]
     goos: linux
     goarch: amd64
     goarm: ''
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - marrrrrrrrry/watchtower:amd64-{{ .Version }}
-      - marrrrrrrrry/watchtower:amd64-latest
-      - ghcr.io/marrrrrrrrry/watchtower:amd64-{{ .Version }}
-      - ghcr.io/marrrrrrrrry/watchtower:amd64-latest
-    binaries:
+      - "marrrrrrrrry/watchtower:amd64-{{ .Tag }}"
+      - "marrrrrrrrry/watchtower:amd64-latest"
+      - "ghcr.io/marrrrrrrrry/watchtower:amd64-{{ .Tag }}"
+      - "ghcr.io/marrrrrrrrry/watchtower:amd64-latest"
+    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
+    ids:
       - watchtower
-  - 
-    use_buildx: true
+  - use: buildx
     build_flag_templates: [ "--platform=linux/386" ]
     goos: linux
     goarch: 386
     goarm: ''
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - marrrrrrrrry/watchtower:i386-{{ .Version }}
-      - marrrrrrrrry/watchtower:i386-latest
-      - ghcr.io/marrrrrrrrry/watchtower:i386-{{ .Version }}
-      - ghcr.io/marrrrrrrrry/watchtower:i386-latest
-    binaries:
+      - "marrrrrrrrry/watchtower:i386-{{ .Tag }}"
+      - "marrrrrrrrry/watchtower:i386-latest"
+      - "ghcr.io/marrrrrrrrry/watchtower:i386-{{ .Tag }}"
+      - "ghcr.io/marrrrrrrrry/watchtower:i386-latest"
+    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
+    ids:
       - watchtower
-  - 
-    use_buildx: true
+  - use: buildx
     build_flag_templates: [ "--platform=linux/arm/v7" ]
     goos: linux
     goarch: arm
     goarm: 6
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - marrrrrrrrry/watchtower:armhf-{{ .Version }}
-      - marrrrrrrrry/watchtower:armhf-latest
-      - ghcr.io/marrrrrrrrry/watchtower:armhf-{{ .Version }}
-      - ghcr.io/marrrrrrrrry/watchtower:armhf-latest
-    binaries:
+      - "marrrrrrrrry/watchtower:armhf-{{ .Tag }}"
+      - "marrrrrrrrry/watchtower:armhf-latest"
+      - "ghcr.io/marrrrrrrrry/watchtower:armhf-{{ .Tag }}"
+      - "ghcr.io/marrrrrrrrry/watchtower:armhf-latest"
+    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
+    ids:
       - watchtower
-  - 
-    use_buildx: true
+  - use: buildx
     build_flag_templates: [ "--platform=linux/arm64/v8" ]
     goos: linux
     goarch: arm64
     goarm: ''
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - marrrrrrrrry/watchtower:arm64v8-{{ .Version }}
-      - marrrrrrrrry/watchtower:arm64v8-latest
-      - ghcr.io/marrrrrrrrry/watchtower:arm64v8-{{ .Version }}
-      - ghcr.io/marrrrrrrrry/watchtower:arm64v8-latest
-    binaries:
+      - "marrrrrrrrry/watchtower:arm64v8-{{ .Tag }}"
+      - "marrrrrrrrry/watchtower:arm64v8-latest"
+      - "ghcr.io/marrrrrrrrry/watchtower:arm64v8-{{ .Tag }}"
+      - "ghcr.io/marrrrrrrrry/watchtower:arm64v8-latest"
+    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
+    ids:
       - watchtower
+
+docker_manifests:
+  - name_template: "marrrrrrrrry/watchtower:{{ .Tag }}"
+    image_templates:
+      - "marrrrrrrrry/watchtower:amd64-{{ .Tag }}"
+      - "marrrrrrrrry/watchtower:i386-{{ .Tag }}"
+      - "marrrrrrrrry/watchtower:armhf-{{ .Tag }}"
+      - "marrrrrrrrry/watchtower:arm64v8-{{ .Tag }}"
+    create_flags:
+      - --insecure
+    push_flags:
+      - --insecure
+  - name_template: "ghcr.io/marrrrrrrrry/watchtower:{{ .Tag }}"
+    image_templates:
+      - "ghcr.io/marrrrrrrrry/watchtower:amd64-{{ .Tag }}"
+      - "ghcr.io/marrrrrrrrry/watchtower:i386-{{ .Tag }}"
+      - "ghcr.io/marrrrrrrrry/watchtower:armhf-{{ .Tag }}"
+      - "ghcr.io/marrrrrrrrry/watchtower:arm64v8-{{ .Tag }}"
+    create_flags:
+      - --insecure
+    push_flags:
+      - --insecure
+  - name_template: "marrrrrrrrry/watchtower:latest"
+    image_templates:
+      - "marrrrrrrrry/watchtower:amd64-latest"
+      - "marrrrrrrrry/watchtower:i386-latest"
+      - "marrrrrrrrry/watchtower:armhf-latest"
+      - "marrrrrrrrry/watchtower:arm64v8-latest"
+    create_flags:
+      - --insecure
+    push_flags:
+      - --insecure
+    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
+  - name_template: "ghcr.io/marrrrrrrrry/watchtower:latest"
+    image_templates:
+      - "ghcr.io/marrrrrrrrry/watchtower:amd64-latest"
+      - "ghcr.io/marrrrrrrrry/watchtower:i386-latest"
+      - "ghcr.io/marrrrrrrrry/watchtower:armhf-latest"
+      - "ghcr.io/marrrrrrrrry/watchtower:arm64v8-latest"
+    create_flags:
+      - --insecure
+    push_flags:
+      - --insecure
+    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
