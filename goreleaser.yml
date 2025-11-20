@@ -45,6 +45,7 @@ archives:
     files:
       - LICENSE.md
 dockers:
+  # 所有版本都推送带版本号的镜像
   - use: buildx
     build_flag_templates: [ "--platform=linux/amd64" ]
     goos: linux
@@ -53,8 +54,52 @@ dockers:
     dockerfile: dockerfiles/Dockerfile
     image_templates:
       - "marrrrrrrrry/watchtower:amd64-{{ .Tag }}"
-      - "marrrrrrrrry/watchtower:amd64-latest"
       - "ghcr.io/marrrrrrrrry/watchtower:amd64-{{ .Tag }}"
+    ids:
+      - watchtower
+  - use: buildx
+    build_flag_templates: [ "--platform=linux/386" ]
+    goos: linux
+    goarch: 386
+    goarm: ''
+    dockerfile: dockerfiles/Dockerfile
+    image_templates:
+      - "marrrrrrrrry/watchtower:i386-{{ .Tag }}"
+      - "ghcr.io/marrrrrrrrry/watchtower:i386-{{ .Tag }}"
+    ids:
+      - watchtower
+  - use: buildx
+    build_flag_templates: [ "--platform=linux/arm/v7" ]
+    goos: linux
+    goarch: arm
+    goarm: 7
+    dockerfile: dockerfiles/Dockerfile
+    image_templates:
+      - "marrrrrrrrry/watchtower:armhf-{{ .Tag }}"
+      - "ghcr.io/marrrrrrrrry/watchtower:armhf-{{ .Tag }}"
+    ids:
+      - watchtower
+  - use: buildx
+    build_flag_templates: [ "--platform=linux/arm64/v8" ]
+    goos: linux
+    goarch: arm64
+    goarm: ''
+    dockerfile: dockerfiles/Dockerfile
+    image_templates:
+      - "marrrrrrrrry/watchtower:arm64v8-{{ .Tag }}"
+      - "ghcr.io/marrrrrrrrry/watchtower:arm64v8-{{ .Tag }}"
+    ids:
+      - watchtower
+
+  # 只有正式版才推送 latest
+  - use: buildx
+    build_flag_templates: [ "--platform=linux/amd64" ]
+    goos: linux
+    goarch: amd64
+    goarm: ''
+    dockerfile: dockerfiles/Dockerfile
+    image_templates:
+      - "marrrrrrrrry/watchtower:amd64-latest"
       - "ghcr.io/marrrrrrrrry/watchtower:amd64-latest"
     skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
     ids:
@@ -66,9 +111,7 @@ dockers:
     goarm: ''
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - "marrrrrrrrry/watchtower:i386-{{ .Tag }}"
       - "marrrrrrrrry/watchtower:i386-latest"
-      - "ghcr.io/marrrrrrrrry/watchtower:i386-{{ .Tag }}"
       - "ghcr.io/marrrrrrrrry/watchtower:i386-latest"
     skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
     ids:
@@ -77,12 +120,10 @@ dockers:
     build_flag_templates: [ "--platform=linux/arm/v7" ]
     goos: linux
     goarch: arm
-    goarm: 6
+    goarm: 7
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - "marrrrrrrrry/watchtower:armhf-{{ .Tag }}"
       - "marrrrrrrrry/watchtower:armhf-latest"
-      - "ghcr.io/marrrrrrrrry/watchtower:armhf-{{ .Tag }}"
       - "ghcr.io/marrrrrrrrry/watchtower:armhf-latest"
     skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
     ids:
@@ -94,9 +135,7 @@ dockers:
     goarm: ''
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - "marrrrrrrrry/watchtower:arm64v8-{{ .Tag }}"
       - "marrrrrrrrry/watchtower:arm64v8-latest"
-      - "ghcr.io/marrrrrrrrry/watchtower:arm64v8-{{ .Tag }}"
       - "ghcr.io/marrrrrrrrry/watchtower:arm64v8-latest"
     skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
     ids:
