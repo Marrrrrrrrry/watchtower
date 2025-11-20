@@ -12,7 +12,6 @@ import (
 
 	t "github.com/Marrrrrrrrry/watchtower/pkg/types"
 
-	types "github.com/docker/docker/api/types"
 	contTypes "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	imageTypes "github.com/docker/docker/api/types/image"
@@ -197,8 +196,8 @@ func ListContainersHandler(statuses ...string) http.HandlerFunc {
 func respondWithFilteredContainers(filters filters.Args) http.HandlerFunc {
 	containersJSON, err := getMockJSONFile("./mocks/data/containers.json")
 	O.ExpectWithOffset(2, err).ShouldNot(O.HaveOccurred())
-	var filteredContainers []types.Container
-	var containers []types.Container
+	var filteredContainers []contTypes.Summary
+	var containers []contTypes.Summary
 	O.ExpectWithOffset(2, json.Unmarshal(containersJSON, &containers)).To(O.Succeed())
 	for _, v := range containers {
 		for _, key := range filters.Get("status") {

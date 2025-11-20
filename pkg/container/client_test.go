@@ -1,7 +1,6 @@
 package container
 
 import (
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/network"
 	"time"
 
@@ -10,10 +9,10 @@ import (
 	"github.com/Marrrrrrrrry/watchtower/pkg/filters"
 	t "github.com/Marrrrrrrrry/watchtower/pkg/types"
 
+	"github.com/containerd/errdefs"
 	"github.com/docker/docker/api/types/backend"
 	contTypes "github.com/docker/docker/api/types/container"
 	cli "github.com/docker/docker/client"
-	"github.com/docker/docker/errdefs"
 	"github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/ghttp"
 	"github.com/sirupsen/logrus"
@@ -330,7 +329,7 @@ var _ = Describe("the client", func() {
 				endpoints := map[string]*network.EndpointSettings{
 					`test`: {Aliases: aliases},
 				}
-				container.containerInfo.NetworkSettings = &types.NetworkSettings{Networks: endpoints}
+				container.containerInfo.NetworkSettings = &contTypes.NetworkSettings{Networks: endpoints}
 				Expect(container.ContainerInfo().NetworkSettings.Networks[`test`].Aliases).To(Equal(aliases))
 				Expect(client.GetNetworkConfig(container).EndpointsConfig[`test`].Aliases).To(Equal([]string{"One", "Two", "Four"}))
 			})

@@ -7,13 +7,13 @@ import (
 	"time"
 
 	"context"
+	"github.com/containerd/errdefs"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	imageTypes "github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/versions"
 	sdkClient "github.com/docker/docker/client"
-	"github.com/docker/docker/errdefs"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/Marrrrrrrrry/watchtower/pkg/registry"

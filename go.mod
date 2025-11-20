@@ -3,6 +3,7 @@ module github.com/Marrrrrrrrry/watchtower
 go 1.25
 
 require (
+	github.com/containerd/errdefs v1.0.0
 	github.com/containrrr/shoutrrr v0.8.0
 	github.com/distribution/reference v0.6.0
 	github.com/docker/cli v28.5.2+incompatible
@@ -21,7 +22,6 @@ require (
 )
 
 require (
-	github.com/containerd/errdefs v1.0.0 // indirect
 	github.com/containerd/errdefs/pkg v0.3.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
