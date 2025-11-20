@@ -86,114 +86,11 @@ jobs:
           args: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Enable experimental docker features
-        run: |
-          mkdir -p ~/.docker/ && \
-          echo '{"experimental": "enabled"}' > ~/.docker/config.json
-      - name: Create manifest for version
-        run: |
-          export VERSION_TAG=${TAG#v}
-          docker manifest create \
-            marrrrrrrrry/watchtower:$VERSION_TAG \
-            marrrrrrrrry/watchtower:amd64-$VERSION_TAG \
-            marrrrrrrrry/watchtower:i386-$VERSION_TAG \
-            marrrrrrrrry/watchtower:armhf-$VERSION_TAG \
-            marrrrrrrrry/watchtower:arm64v8-$VERSION_TAG
-          docker manifest create \
-            ghcr.io/marrrrrrrrry/watchtower:$VERSION_TAG \
-            ghcr.io/marrrrrrrrry/watchtower:amd64-$VERSION_TAG \
-            ghcr.io/marrrrrrrrry/watchtower:i386-$VERSION_TAG \
-            ghcr.io/marrrrrrrrry/watchtower:armhf-$VERSION_TAG \
-            ghcr.io/marrrrrrrrry/watchtower:arm64v8-$VERSION_TAG
-      - name: Annotate manifest for version
-        run: |
-          for REPO in '' ghcr.io/ ; do
-          
-          docker manifest annotate \
-            ${REPO}marrrrrrrrry/watchtower:${TAG#v} \
-            ${REPO}marrrrrrrrry/watchtower:i386-${TAG#v} \
-            --os linux \
-            --arch 386
-          
-          docker manifest annotate \
-            ${REPO}marrrrrrrrry/watchtower:${TAG#v} \
-            ${REPO}marrrrrrrrry/watchtower:armhf-${TAG#v} \
-            --os linux \
-            --arch arm
-      
-          docker manifest annotate \
-            ${REPO}marrrrrrrrry/watchtower:${TAG#v} \
-            ${REPO}marrrrrrrrry/watchtower:arm64v8-${TAG#v} \
-            --os linux \
-            --arch arm64 \
-            --variant v8
-            
-            done
-      - name: Create manifest for latest
-        if: ${{ !contains(github.ref_name, '-') }}
-        run: |
-          docker manifest create \
-            marrrrrrrrry/watchtower:latest \
-            marrrrrrrrry/watchtower:amd64-latest \
-            marrrrrrrrry/watchtower:i386-latest \
-            marrrrrrrrry/watchtower:armhf-latest \
-            marrrrrrrrry/watchtower:arm64v8-latest
-          docker manifest create \
-            ghcr.io/marrrrrrrrry/watchtower:latest \
-            ghcr.io/marrrrrrrrry/watchtower:amd64-latest \
-            ghcr.io/marrrrrrrrry/watchtower:i386-latest \
-            ghcr.io/marrrrrrrrry/watchtower:armhf-latest \
-            ghcr.io/marrrrrrrrry/watchtower:arm64v8-latest
-      - name: Annotate manifest for latest
-        if: ${{ !contains(github.ref_name, '-') }}
-        run: |
-          for REPO in '' ghcr.io/ ; do
-
-          docker manifest annotate \
-            ${REPO}marrrrrrrrry/watchtower:latest \
-            ${REPO}marrrrrrrrry/watchtower:i386-latest \
-            --os linux \
-            --arch 386
-      
-          docker manifest annotate \
-            ${REPO}marrrrrrrrry/watchtower:latest \
-            ${REPO}marrrrrrrrry/watchtower:armhf-latest \
-            --os linux \
-            --arch arm
-            
-          docker manifest annotate \
-            ${REPO}marrrrrrrrry/watchtower:latest \
-            ${REPO}marrrrrrrrry/watchtower:arm64v8-latest \
-            --os linux \
-            --arch arm64 \
-            --variant v8
-
-          done
-      - name: Push manifests to Dockerhub
-        env:
-          DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-        run: |
-          docker login -u $DOCKER_USER -p $DOCKER_TOKEN && \
-            docker manifest push marrrrrrrrry/watchtower:${TAG#v}
-          if [[ "$TAG" != *-* ]]; then
-            docker manifest push marrrrrrrrry/watchtower:latest
-          fi
-      - name: Push manifests to GitHub Container Registry
-        env:
-          DOCKER_USER: ${{ secrets.BOT_USERNAME }}
-          DOCKER_TOKEN: ${{ secrets.BOT_GHCR_PAT }}
-        run: |
-          docker login -u $DOCKER_USER -p $DOCKER_TOKEN ghcr.io && \
-            docker manifest push ghcr.io/marrrrrrrrry/watchtower:${TAG#v}
-          if [[ "$TAG" != *-* ]]; then
-            docker manifest push ghcr.io/marrrrrrrrry/watchtower:latest
-          fi
 
   renew-docs:
     name: Refresh pkg.go.dev
     needs: build
     runs-on: ubuntu-latest
     steps:
-    - name: Pull new module version
-      uses: andrewslotin/go-proxy-pull-action@v1.3.0
+      - name: Pull new module version
+        uses: andrewslotin/go-proxy-pull-action@v1.3.0
