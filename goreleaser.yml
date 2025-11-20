@@ -78,9 +78,14 @@ archives:
     files:
       - LICENSE.md
 dockers:
-  # 所有版本都推送带版本号的镜像
+  # 构建平台镜像，但不推送（供 manifest 使用）
   - use: buildx
-    build_flag_templates: [ "--platform=linux/amd64" ]
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
     goos: linux
     goarch: amd64
     goarm: ''
@@ -88,10 +93,16 @@ dockers:
     image_templates:
       - "marrrrrrrrry/watchtower:amd64-{{ .Tag }}"
       - "ghcr.io/marrrrrrrrry/watchtower:amd64-{{ .Tag }}"
+    skip_push: true  # 构建但不推送平台专属 tag
     ids:
       - watchtower-linux-amd64
   - use: buildx
-    build_flag_templates: [ "--platform=linux/386" ]
+    build_flag_templates:
+      - "--platform=linux/386"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
     goos: linux
     goarch: 386
     goarm: ''
@@ -99,10 +110,16 @@ dockers:
     image_templates:
       - "marrrrrrrrry/watchtower:i386-{{ .Tag }}"
       - "ghcr.io/marrrrrrrrry/watchtower:i386-{{ .Tag }}"
+    skip_push: true  # 构建但不推送平台专属 tag
     ids:
       - watchtower-linux-386
   - use: buildx
-    build_flag_templates: [ "--platform=linux/arm/v7" ]
+    build_flag_templates:
+      - "--platform=linux/arm/v7"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
     goos: linux
     goarch: arm
     goarm: 7
@@ -110,10 +127,16 @@ dockers:
     image_templates:
       - "marrrrrrrrry/watchtower:armhf-{{ .Tag }}"
       - "ghcr.io/marrrrrrrrry/watchtower:armhf-{{ .Tag }}"
+    skip_push: true  # 构建但不推送平台专属 tag
     ids:
       - watchtower-linux-armv7
   - use: buildx
-    build_flag_templates: [ "--platform=linux/arm64/v8" ]
+    build_flag_templates:
+      - "--platform=linux/arm64/v8"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
     goos: linux
     goarch: arm64
     goarm: ''
@@ -121,12 +144,18 @@ dockers:
     image_templates:
       - "marrrrrrrrry/watchtower:arm64v8-{{ .Tag }}"
       - "ghcr.io/marrrrrrrrry/watchtower:arm64v8-{{ .Tag }}"
+    skip_push: true  # 构建但不推送平台专属 tag
     ids:
       - watchtower-linux-arm64
 
-  # 只有正式版才推送 latest
+  # 构建 latest 平台镜像，但不推送（供 manifest 使用）
   - use: buildx
-    build_flag_templates: [ "--platform=linux/amd64" ]
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
     goos: linux
     goarch: amd64
     goarm: ''
@@ -134,11 +163,16 @@ dockers:
     image_templates:
       - "marrrrrrrrry/watchtower:amd64-latest"
       - "ghcr.io/marrrrrrrrry/watchtower:amd64-latest"
-    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
+    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"  # 构建但不推送平台专属 latest tag
     ids:
       - watchtower-linux-amd64
   - use: buildx
-    build_flag_templates: [ "--platform=linux/386" ]
+    build_flag_templates:
+      - "--platform=linux/386"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
     goos: linux
     goarch: 386
     goarm: ''
@@ -146,11 +180,16 @@ dockers:
     image_templates:
       - "marrrrrrrrry/watchtower:i386-latest"
       - "ghcr.io/marrrrrrrrry/watchtower:i386-latest"
-    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
+    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"  # 构建但不推送平台专属 latest tag
     ids:
       - watchtower-linux-386
   - use: buildx
-    build_flag_templates: [ "--platform=linux/arm/v7" ]
+    build_flag_templates:
+      - "--platform=linux/arm/v7"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
     goos: linux
     goarch: arm
     goarm: 7
@@ -158,11 +197,16 @@ dockers:
     image_templates:
       - "marrrrrrrrry/watchtower:armhf-latest"
       - "ghcr.io/marrrrrrrrry/watchtower:armhf-latest"
-    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
+    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"  # 构建但不推送平台专属 latest tag
     ids:
       - watchtower-linux-armv7
   - use: buildx
-    build_flag_templates: [ "--platform=linux/arm64/v8" ]
+    build_flag_templates:
+      - "--platform=linux/arm64/v8"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
     goos: linux
     goarch: arm64
     goarm: ''
@@ -170,11 +214,12 @@ dockers:
     image_templates:
       - "marrrrrrrrry/watchtower:arm64v8-latest"
       - "ghcr.io/marrrrrrrrry/watchtower:arm64v8-latest"
-    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
+    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"  # 构建但不推送平台专属 latest tag
     ids:
       - watchtower-linux-arm64
 
 docker_manifests:
+  # 仅发布一个多架构 tag（版本号），引用构建但不推送的平台镜像
   - name_template: "marrrrrrrrry/watchtower:{{ .Tag }}"
     image_templates:
       - "marrrrrrrrry/watchtower:amd64-{{ .Tag }}"
@@ -195,6 +240,7 @@ docker_manifests:
       - --insecure
     push_flags:
       - --insecure
+  # 仅发布一个多架构 latest tag
   - name_template: "marrrrrrrrry/watchtower:latest"
     image_templates:
       - "marrrrrrrrry/watchtower:amd64-latest"
