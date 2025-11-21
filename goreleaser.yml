@@ -78,7 +78,7 @@ archives:
     files:
       - LICENSE.md
 dockers:
-  # 构建平台镜像，但不推送（供 manifest 使用）
+  # 推送平台镜像到临时 tag（供 manifest 使用）
   - use: buildx
     build_flag_templates:
       - "--platform=linux/amd64"
@@ -91,9 +91,8 @@ dockers:
     goarm: ''
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - "marrrrrrrrry/watchtower:amd64-{{ .Tag }}"
-      - "ghcr.io/marrrrrrrrry/watchtower:amd64-{{ .Tag }}"
-    skip_push: true  # 构建但不推送平台专属 tag
+      - "marrrrrrrrry/watchtower:{{ .Tag }}-amd64-internal"
+      - "ghcr.io/marrrrrrrrry/watchtower:{{ .Tag }}-amd64-internal"
     ids:
       - watchtower-linux-amd64
   - use: buildx
@@ -108,9 +107,8 @@ dockers:
     goarm: ''
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - "marrrrrrrrry/watchtower:i386-{{ .Tag }}"
-      - "ghcr.io/marrrrrrrrry/watchtower:i386-{{ .Tag }}"
-    skip_push: true  # 构建但不推送平台专属 tag
+      - "marrrrrrrrry/watchtower:{{ .Tag }}-i386-internal"
+      - "ghcr.io/marrrrrrrrry/watchtower:{{ .Tag }}-i386-internal"
     ids:
       - watchtower-linux-386
   - use: buildx
@@ -125,9 +123,8 @@ dockers:
     goarm: 7
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - "marrrrrrrrry/watchtower:armhf-{{ .Tag }}"
-      - "ghcr.io/marrrrrrrrry/watchtower:armhf-{{ .Tag }}"
-    skip_push: true  # 构建但不推送平台专属 tag
+      - "marrrrrrrrry/watchtower:{{ .Tag }}-armhf-internal"
+      - "ghcr.io/marrrrrrrrry/watchtower:{{ .Tag }}-armhf-internal"
     ids:
       - watchtower-linux-armv7
   - use: buildx
@@ -142,13 +139,12 @@ dockers:
     goarm: ''
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - "marrrrrrrrry/watchtower:arm64v8-{{ .Tag }}"
-      - "ghcr.io/marrrrrrrrry/watchtower:arm64v8-{{ .Tag }}"
-    skip_push: true  # 构建但不推送平台专属 tag
+      - "marrrrrrrrry/watchtower:{{ .Tag }}-arm64v8-internal"
+      - "ghcr.io/marrrrrrrrry/watchtower:{{ .Tag }}-arm64v8-internal"
     ids:
       - watchtower-linux-arm64
 
-  # 构建 latest 平台镜像，但不推送（供 manifest 使用）
+  # 推送 latest 平台镜像到临时 tag（供 manifest 使用）
   - use: buildx
     build_flag_templates:
       - "--platform=linux/amd64"
@@ -161,9 +157,9 @@ dockers:
     goarm: ''
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - "marrrrrrrrry/watchtower:amd64-latest"
-      - "ghcr.io/marrrrrrrrry/watchtower:amd64-latest"
-    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"  # 构建但不推送平台专属 latest tag
+      - "marrrrrrrrry/watchtower:latest-amd64-internal"
+      - "ghcr.io/marrrrrrrrry/watchtower:latest-amd64-internal"
+    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
     ids:
       - watchtower-linux-amd64
   - use: buildx
@@ -178,9 +174,9 @@ dockers:
     goarm: ''
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - "marrrrrrrrry/watchtower:i386-latest"
-      - "ghcr.io/marrrrrrrrry/watchtower:i386-latest"
-    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"  # 构建但不推送平台专属 latest tag
+      - "marrrrrrrrry/watchtower:latest-i386-internal"
+      - "ghcr.io/marrrrrrrrry/watchtower:latest-i386-internal"
+    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
     ids:
       - watchtower-linux-386
   - use: buildx
@@ -195,9 +191,9 @@ dockers:
     goarm: 7
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - "marrrrrrrrry/watchtower:armhf-latest"
-      - "ghcr.io/marrrrrrrrry/watchtower:armhf-latest"
-    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"  # 构建但不推送平台专属 latest tag
+      - "marrrrrrrrry/watchtower:latest-armhf-internal"
+      - "ghcr.io/marrrrrrrrry/watchtower:latest-armhf-internal"
+    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
     ids:
       - watchtower-linux-armv7
   - use: buildx
@@ -212,30 +208,30 @@ dockers:
     goarm: ''
     dockerfile: dockerfiles/Dockerfile
     image_templates:
-      - "marrrrrrrrry/watchtower:arm64v8-latest"
-      - "ghcr.io/marrrrrrrrry/watchtower:arm64v8-latest"
-    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"  # 构建但不推送平台专属 latest tag
+      - "marrrrrrrrry/watchtower:latest-arm64v8-internal"
+      - "ghcr.io/marrrrrrrrry/watchtower:latest-arm64v8-internal"
+    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
     ids:
       - watchtower-linux-arm64
 
 docker_manifests:
-  # 仅发布一个多架构 tag（版本号），引用构建但不推送的平台镜像
+  # 仅发布一个多架构 tag（版本号），引用临时内部 tag
   - name_template: "marrrrrrrrry/watchtower:{{ .Tag }}"
     image_templates:
-      - "marrrrrrrrry/watchtower:amd64-{{ .Tag }}"
-      - "marrrrrrrrry/watchtower:i386-{{ .Tag }}"
-      - "marrrrrrrrry/watchtower:armhf-{{ .Tag }}"
-      - "marrrrrrrrry/watchtower:arm64v8-{{ .Tag }}"
+      - "marrrrrrrrry/watchtower:{{ .Tag }}-amd64-internal"
+      - "marrrrrrrrry/watchtower:{{ .Tag }}-i386-internal"
+      - "marrrrrrrrry/watchtower:{{ .Tag }}-armhf-internal"
+      - "marrrrrrrrry/watchtower:{{ .Tag }}-arm64v8-internal"
     create_flags:
       - --insecure
     push_flags:
       - --insecure
   - name_template: "ghcr.io/marrrrrrrrry/watchtower:{{ .Tag }}"
     image_templates:
-      - "ghcr.io/marrrrrrrrry/watchtower:amd64-{{ .Tag }}"
-      - "ghcr.io/marrrrrrrrry/watchtower:i386-{{ .Tag }}"
-      - "ghcr.io/marrrrrrrrry/watchtower:armhf-{{ .Tag }}"
-      - "ghcr.io/marrrrrrrrry/watchtower:arm64v8-{{ .Tag }}"
+      - "ghcr.io/marrrrrrrrry/watchtower:{{ .Tag }}-amd64-internal"
+      - "ghcr.io/marrrrrrrrry/watchtower:{{ .Tag }}-i386-internal"
+      - "ghcr.io/marrrrrrrrry/watchtower:{{ .Tag }}-armhf-internal"
+      - "ghcr.io/marrrrrrrrry/watchtower:{{ .Tag }}-arm64v8-internal"
     create_flags:
       - --insecure
     push_flags:
@@ -243,10 +239,10 @@ docker_manifests:
   # 仅发布一个多架构 latest tag
   - name_template: "marrrrrrrrry/watchtower:latest"
     image_templates:
-      - "marrrrrrrrry/watchtower:amd64-latest"
-      - "marrrrrrrrry/watchtower:i386-latest"
-      - "marrrrrrrrry/watchtower:armhf-latest"
-      - "marrrrrrrrry/watchtower:arm64v8-latest"
+      - "marrrrrrrrry/watchtower:latest-amd64-internal"
+      - "marrrrrrrrry/watchtower:latest-i386-internal"
+      - "marrrrrrrrry/watchtower:latest-armhf-internal"
+      - "marrrrrrrrry/watchtower:latest-arm64v8-internal"
     create_flags:
       - --insecure
     push_flags:
@@ -254,10 +250,10 @@ docker_manifests:
     skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
   - name_template: "ghcr.io/marrrrrrrrry/watchtower:latest"
     image_templates:
-      - "ghcr.io/marrrrrrrrry/watchtower:amd64-latest"
-      - "ghcr.io/marrrrrrrrry/watchtower:i386-latest"
-      - "ghcr.io/marrrrrrrrry/watchtower:armhf-latest"
-      - "ghcr.io/marrrrrrrrry/watchtower:arm64v8-latest"
+      - "ghcr.io/marrrrrrrrry/watchtower:latest-amd64-internal"
+      - "ghcr.io/marrrrrrrrry/watchtower:latest-i386-internal"
+      - "ghcr.io/marrrrrrrrry/watchtower:latest-armhf-internal"
+      - "ghcr.io/marrrrrrrrry/watchtower:latest-arm64v8-internal"
     create_flags:
       - --insecure
     push_flags:
