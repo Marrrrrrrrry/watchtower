@@ -12,10 +12,10 @@ import (
 	wt "github.com/Marrrrrrrrry/watchtower/pkg/types"
 	"github.com/sirupsen/logrus"
 
-	dockercontainer "github.com/docker/docker/api/types/container"
-	imageTypes "github.com/docker/docker/api/types/image"
-	"github.com/docker/go-connections/nat"
 	v1 "github.com/moby/docker-image-spec/specs-go/v1"
+	dockercontainer "github.com/moby/moby/api/types/container"
+	imageTypes "github.com/moby/moby/api/types/image"
+	"github.com/moby/moby/api/types/network"
 )
 
 // NewContainer returns a new Container instance instantiated with the
@@ -369,11 +369,11 @@ func convertImageConfig(ociConfig *v1.DockerOCIImageConfig) *dockercontainer.Con
 			Retries:     ociConfig.Healthcheck.Retries,
 		}
 	}
-	var exposed nat.PortSet
+	var exposed network.PortSet
 	if ociConfig.ExposedPorts != nil {
-		exposed = make(nat.PortSet)
+		exposed = make(network.PortSet)
 		for port := range ociConfig.ExposedPorts {
-			exposed[nat.Port(port)] = struct{}{}
+			exposed[network.MustParsePort(port)] = struct{}{}
 		}
 	}
 	var vols map[string]struct{}
@@ -465,7 +465,7 @@ func (c Container) VerifyConfiguration() error {
 	// Instead of returning an error here, we just create an empty map
 	// This should allow for updating containers where the exposed ports are missing
 	if len(hostConfig.PortBindings) > 0 && containerConfig.ExposedPorts == nil {
-		containerConfig.ExposedPorts = make(map[nat.Port]struct{})
+		containerConfig.ExposedPorts = make(network.PortSet)
 	}
 
 	return nil

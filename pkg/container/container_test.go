@@ -2,8 +2,8 @@ package container
 
 import (
 	"github.com/Marrrrrrrrry/watchtower/pkg/types"
-	dc "github.com/docker/docker/api/types/container"
-	"github.com/docker/go-connections/nat"
+	dc "github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/api/types/network"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -62,7 +62,7 @@ var _ = Describe("the container", func() {
 		When("verifying a container with port bindings and exposed ports is non-nil", func() {
 			It("should return an error", func() {
 				c := MockContainer(WithPortBindings("80/tcp"))
-				c.containerInfo.Config.ExposedPorts = map[nat.Port]struct{}{"80/tcp": {}}
+				c.containerInfo.Config.ExposedPorts = network.PortSet{network.MustParsePort("80/tcp"): {}}
 				err := c.VerifyConfiguration()
 				Expect(err).ToNot(HaveOccurred())
 			})

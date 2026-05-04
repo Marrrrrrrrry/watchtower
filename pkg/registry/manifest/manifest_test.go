@@ -6,7 +6,7 @@ import (
 
 	"github.com/Marrrrrrrrry/watchtower/internal/actions/mocks"
 	"github.com/Marrrrrrrrry/watchtower/pkg/registry/manifest"
-	imageTypes "github.com/docker/docker/api/types/image"
+	imageTypes "github.com/moby/moby/api/types/image"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

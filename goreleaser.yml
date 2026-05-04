@@ -78,7 +78,7 @@ archives:
     files:
       - LICENSE.md
 dockers:
-  # 推送平台镜像到临时 tag（供 manifest 使用）
+  # Push platform image to temporary tag (for manifest use)
   - use: buildx
     build_flag_templates:
       - "--platform=linux/amd64"
@@ -144,7 +144,7 @@ dockers:
     ids:
       - watchtower-linux-arm64
 
-  # 推送 latest 平台镜像到临时 tag（供 manifest 使用）
+  # Push latest platform image to temporary tag (for manifest use)
   - use: buildx
     build_flag_templates:
       - "--platform=linux/amd64"
@@ -215,7 +215,7 @@ dockers:
       - watchtower-linux-arm64
 
 docker_manifests:
-  # 仅发布一个多架构 tag（版本号），引用临时内部 tag
+  # Publish only one multi-arch tag (version), referencing temporary internal tags
   - name_template: "marrrrrrrrry/watchtower:{{ .Tag }}"
     image_templates:
       - "marrrrrrrrry/watchtower:{{ .Tag }}-amd64-internal"
@@ -236,7 +236,7 @@ docker_manifests:
       - --insecure
     push_flags:
       - --insecure
-  # 仅发布一个多架构 latest tag
+  # Publish only one multi-arch latest tag
   - name_template: "marrrrrrrrry/watchtower:latest"
     image_templates:
       - "marrrrrrrrry/watchtower:latest-amd64-internal"

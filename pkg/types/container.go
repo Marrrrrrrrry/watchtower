@@ -3,8 +3,8 @@ package types
 import (
 	"strings"
 
-	dc "github.com/docker/docker/api/types/container"
-	imageTypes "github.com/docker/docker/api/types/image"
+	dc "github.com/moby/moby/api/types/container"
+	imageTypes "github.com/moby/moby/api/types/image"
 )
 
 // ImageID is a hash string representing a container image

@@ -5,26 +5,22 @@ import (
 	"github.com/Marrrrrrrrry/watchtower/pkg/registry/helpers"
 	watchtowerTypes "github.com/Marrrrrrrrry/watchtower/pkg/types"
 	ref "github.com/distribution/reference"
-	"github.com/docker/docker/api/types/image"
+	sdkClient "github.com/moby/moby/client"
 	log "github.com/sirupsen/logrus"
 )
 
-// GetPullOptions creates a struct with all options needed for pulling images from a registry
-func GetPullOptions(imageName string) (image.PullOptions, error) {
+func GetPullOptions(imageName string) (sdkClient.ImagePullOptions, error) {
 	auth, err := EncodedAuth(imageName)
 	log.Debugf("Got image name: %s", imageName)
 	if err != nil {
-		return image.PullOptions{}, err
+		return sdkClient.ImagePullOptions{}, err
 	}
 
 	if auth == "" {
-		return image.PullOptions{}, nil
+		return sdkClient.ImagePullOptions{}, nil
 	}
 
-	// CREDENTIAL: Uncomment to log docker config auth
-	// log.Tracef("Got auth value: %s", auth)
-
-	return image.PullOptions{
+	return sdkClient.ImagePullOptions{
 		RegistryAuth:  auth,
 		PrivilegeFunc: DefaultAuthHandler,
 	}, nil

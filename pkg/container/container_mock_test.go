@@ -1,23 +1,21 @@
 package container
 
 import (
-	"github.com/docker/docker/api/types/container"
-	imageTypes "github.com/docker/docker/api/types/image"
-	"github.com/docker/go-connections/nat"
 	specs "github.com/moby/docker-image-spec/specs-go/v1"
+	"github.com/moby/moby/api/types/container"
+	imageTypes "github.com/moby/moby/api/types/image"
+	"github.com/moby/moby/api/types/network"
 )
 
 type MockContainerUpdate func(*container.InspectResponse, *imageTypes.InspectResponse)
 
 func MockContainer(updates ...MockContainerUpdate) *Container {
 	containerInfo := container.InspectResponse{
-		ContainerJSONBase: &container.ContainerJSONBase{
-			ID:         "container_id",
-			Image:      "image",
-			Name:       "test-containrrr",
-			HostConfig: &container.HostConfig{},
-		},
-		Config: &container.Config{Labels: map[string]string{}},
+		ID:         "container_id",
+		Image:      "image",
+		Name:       "test-containrrr",
+		HostConfig: &container.HostConfig{},
+		Config:     &container.Config{Labels: map[string]string{}},
 	}
 	image := imageTypes.InspectResponse{
 		ID:     "image_id",
@@ -32,11 +30,11 @@ func MockContainer(updates ...MockContainerUpdate) *Container {
 
 func WithPortBindings(portBindingSources ...string) MockContainerUpdate {
 	return func(c *container.InspectResponse, i *imageTypes.InspectResponse) {
-		portBindings := nat.PortMap{}
+		portBindings := network.PortMap{}
 		for _, pbs := range portBindingSources {
-			portBindings[nat.Port(pbs)] = []nat.PortBinding{}
+			portBindings[network.MustParsePort(pbs)] = []network.PortBinding{}
 		}
-		c.ContainerJSONBase.HostConfig.PortBindings = portBindings
+		c.HostConfig.PortBindings = portBindings
 	}
 }
 
@@ -49,13 +47,10 @@ func WithImageName(name string) MockContainerUpdate {
 
 func WithLinks(links []string) MockContainerUpdate {
 	return func(c *container.InspectResponse, i *imageTypes.InspectResponse) {
-		if c.ContainerJSONBase == nil {
-			c.ContainerJSONBase = &container.ContainerJSONBase{}
+		if c.HostConfig == nil {
+			c.HostConfig = &container.HostConfig{}
 		}
-		if c.ContainerJSONBase.HostConfig == nil {
-			c.ContainerJSONBase.HostConfig = &container.HostConfig{}
-		}
-		c.ContainerJSONBase.HostConfig.Links = links
+		c.HostConfig.Links = links
 	}
 }
 
@@ -67,10 +62,7 @@ func WithLabels(labels map[string]string) MockContainerUpdate {
 
 func WithContainerState(state container.State) MockContainerUpdate {
 	return func(cnt *container.InspectResponse, img *imageTypes.InspectResponse) {
-		if cnt.ContainerJSONBase == nil {
-			cnt.ContainerJSONBase = &container.ContainerJSONBase{}
-		}
-		cnt.ContainerJSONBase.State = &state
+		cnt.State = &state
 	}
 }
 

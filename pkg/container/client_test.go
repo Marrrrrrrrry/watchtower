@@ -1,8 +1,9 @@
 package container
 
 import (
-	"github.com/docker/docker/api/types/network"
 	"time"
+
+	"github.com/moby/moby/api/types/network"
 
 	"github.com/Marrrrrrrrry/watchtower/internal/util"
 	"github.com/Marrrrrrrrry/watchtower/pkg/container/mocks"
@@ -10,9 +11,8 @@ import (
 	t "github.com/Marrrrrrrrry/watchtower/pkg/types"
 
 	"github.com/containerd/errdefs"
-	"github.com/docker/docker/api/types/backend"
-	contTypes "github.com/docker/docker/api/types/container"
-	cli "github.com/docker/docker/client"
+	contTypes "github.com/moby/moby/api/types/container"
+	cli "github.com/moby/moby/client"
 	"github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/ghttp"
 	"github.com/sirupsen/logrus"
@@ -30,9 +30,17 @@ var _ = Describe("the client", func() {
 	var mockServer *ghttp.Server
 	BeforeEach(func() {
 		mockServer = ghttp.NewServer()
-		docker, _ = cli.NewClientWithOpts(
+		mockServer.RouteToHandler("HEAD", "/_ping", ghttp.RespondWith(http.StatusOK, nil, http.Header{
+			"Api-Version": []string{cli.MaxAPIVersion},
+		}))
+		mockServer.RouteToHandler("GET", "/_ping", ghttp.RespondWith(http.StatusOK, nil, http.Header{
+			"Api-Version": []string{cli.MaxAPIVersion},
+		}))
+		docker, _ = cli.New(
 			cli.WithHost(mockServer.URL()),
-			cli.WithHTTPClient(mockServer.HTTPTestServer.Client()))
+			cli.WithScheme("http"),
+			cli.WithHTTPClient(mockServer.HTTPTestServer.Client()),
+		)
 	})
 	AfterEach(func() {
 		mockServer.Close()
@@ -270,10 +278,11 @@ var _ = Describe("the client", func() {
 					// API.ContainerExecCreate
 					ghttp.CombineHandlers(
 						ghttp.VerifyRequest("POST", HaveSuffix("containers/%v/exec", containerID)),
-						ghttp.VerifyJSONRepresenting(contTypes.ExecOptions{
-							User:   user,
-							Detach: false,
-							Tty:    true,
+						ghttp.VerifyJSONRepresenting(contTypes.ExecCreateRequest{
+							User:         user,
+							Tty:          true,
+							AttachStdout: true,
+							AttachStderr: true,
 							Cmd: []string{
 								"sh",
 								"-c",
@@ -285,7 +294,7 @@ var _ = Describe("the client", func() {
 					// API.ContainerExecStart
 					ghttp.CombineHandlers(
 						ghttp.VerifyRequest("POST", HaveSuffix("exec/%v/start", execID)),
-						ghttp.VerifyJSONRepresenting(contTypes.ExecStartOptions{
+						ghttp.VerifyJSONRepresenting(contTypes.ExecStartRequest{
 							Detach: false,
 							Tty:    true,
 						}),
@@ -294,11 +303,11 @@ var _ = Describe("the client", func() {
 					// API.ContainerExecInspect
 					ghttp.CombineHandlers(
 						ghttp.VerifyRequest("GET", HaveSuffix("exec/ex-exec-id/json")),
-						ghttp.RespondWithJSONEncoded(http.StatusOK, backend.ExecInspect{
+						ghttp.RespondWithJSONEncoded(http.StatusOK, contTypes.ExecInspectResponse{
 							ID:       execID,
 							Running:  false,
 							ExitCode: nil,
-							ProcessConfig: &backend.ExecProcessConfig{
+							ProcessConfig: &contTypes.ExecProcessConfig{
 								Entrypoint: "sh",
 								Arguments:  []string{"-c", cmd},
 								User:       user,
