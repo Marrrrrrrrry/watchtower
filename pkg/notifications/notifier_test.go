@@ -8,7 +8,7 @@ import (
 	"github.com/Marrrrrrrrry/watchtower/cmd"
 	"github.com/Marrrrrrrrry/watchtower/internal/flags"
 	"github.com/Marrrrrrrrry/watchtower/pkg/notifications"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

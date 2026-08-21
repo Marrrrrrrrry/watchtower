@@ -2,7 +2,7 @@
 # Builder
 #
 
-FROM golang:1.25-alpine AS builder
+FROM golang:1.26-alpine AS builder
 
 # use version (for example "v0.3.3") or "main"
 ARG WATCHTOWER_VERSION=main
@@ -15,7 +15,7 @@ COPY go.mod .
 COPY go.sum .
 RUN go mod download
 
-# 安装构建所需工具与证书，保证静态链接与 TLS 可用
+# Install build tools and certificates for static linking and TLS support
 RUN apk add --no-cache \
     alpine-sdk \
     ca-certificates \
@@ -27,7 +27,7 @@ COPY . /watchtower
 RUN \
   cd /watchtower && \
   \
-  # 生成依赖锁并静态构建
+  # Tidy modules and build a static binary
   GO111MODULE=on go mod tidy && \
   GO111MODULE=on CGO_ENABLED=0 GOOS=linux go build -a -ldflags "-extldflags '-static' -X github.com/Marrrrrrrrry/watchtower/internal/meta.Version=${WATCHTOWER_VERSION}" . && \
   if [ "${RUN_TESTS}" = "true" ]; then GO111MODULE=on go test ./... -v; fi
@@ -41,7 +41,7 @@ FROM scratch
 
 LABEL "com.centurylinklabs.watchtower"="true"
 
-# 从 builder 阶段拷贝证书与时区数据，确保运行期 TLS/时区可用
+# Copy certificates and timezone data from the builder stage so TLS and timezones work at runtime
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /watchtower/watchtower /watchtower

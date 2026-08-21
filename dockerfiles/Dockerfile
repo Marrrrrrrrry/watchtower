@@ -1,7 +1,7 @@
-# 使用最新 Alpine 作为运行层，统一平台构建
+# Use the latest Alpine as the runtime layer, pinned to the build platform
 FROM --platform=$BUILDPLATFORM alpine:latest AS alpine
 
-# 安装证书与时区数据，确保运行期 TLS/时区可用
+# Install certificates and timezone data so TLS and timezones work at runtime
 RUN apk add --no-cache \
     ca-certificates \
     tzdata
@@ -15,8 +15,6 @@ COPY --from=alpine \
 COPY --from=alpine \
     /usr/share/zoneinfo \
     /usr/share/zoneinfo
-
-EXPOSE 8080
 
 COPY watchtower /
 

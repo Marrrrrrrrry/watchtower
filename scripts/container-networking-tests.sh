@@ -32,11 +32,11 @@ docker tag qmcgaw/gluetun:v3.34.3  qmcgaw/gluetun:v3.35.0
 
 echo; echo "=== Creating containers..."
 
-docker compose -p "wt-contnet" -f "$COMPOSE_FILE" up -d
+docker compose -p "wt-container-networking" -f "$COMPOSE_FILE" up -d
 
 echo; echo "=== Running watchtower"
 $WATCHTOWER --run-once
 
 echo; echo "=== Removing containers..."
 
-docker compose -p "wt-contnet" -f "$COMPOSE_FILE" down
+docker compose -p "wt-container-networking" -f "$COMPOSE_FILE" down

@@ -7,6 +7,10 @@ on:
   issues:
     types: [opened]
 
+
+permissions:
+  issues: write
+  pull-requests: write
 jobs:
   greeting:
     runs-on: ubuntu-latest
@@ -16,8 +20,8 @@ jobs:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         issue-message: >
           Hi there! 👋🏼
-          As you're new to this repo, we'd like to suggest that you read our [code of conduct](https://github.com/containrrr/.github/blob/master/CODE_OF_CONDUCT.md)
-          as well as our [contribution guidelines](https://github.com/Marrrrrrrrry/watchtower/blob/master/CONTRIBUTING.md).
+          As you're new to this repo, we'd like to suggest that you read our [code of conduct](https://github.com/Marrrrrrrrry/watchtower/blob/main/code_of_conduct.md)
+          as well as our [contribution guidelines](https://github.com/Marrrrrrrrry/watchtower/blob/main/CONTRIBUTING.md).
           Thanks a bunch for opening your first issue! 🙏
         pr-message: >
           Congratulations on opening your first pull request! We'll get back to you as soon as possible. In the meantime, please make sure you've updated the documentation to reflect your changes and have added test automation as needed. Thanks! 🙏🏼

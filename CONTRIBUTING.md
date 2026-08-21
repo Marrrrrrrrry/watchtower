@@ -3,11 +3,11 @@ To contribute code changes to this project you will need the following developme
  * [Go](https://golang.org/doc/install)
  * [Docker](https://docs.docker.com/engine/installation/)
  
-As watchtower utilizes go modules for vendor locking, you'll need at least Go 1.11.
+As watchtower utilizes go modules for vendor locking, you'll need at least Go 1.26.
 You can check your current version of the go language as follows:
 ```bash
   ~ $ go version
-  go version go1.12.1 darwin/amd64
+  go version go1.26.0 darwin/amd64
 ```
 
 
@@ -36,3 +36,12 @@ e.g.:
 ```bash
 sudo docker build . -f dockerfiles/Dockerfile.dev-self-contained -t marrrrrrrrry/watchtower # to build an image from local files
 ```
+
+## Dependency changes and security
+Dependency updates should arrive through Dependabot or be prepared by a maintainer. Pull requests from third parties that claim to fix a vulnerability deserve heightened scrutiny.
+
+When reviewing a pull request that modifies `go.mod` or `go.sum`:
+
+- Accept version changes of module paths that are already in use. A pull request that adds or rewrites a module path, for example by replacing an official module with a similarly named one, must be rejected.
+- Verify reported vulnerabilities against the official Go vulnerability database at [pkg.go.dev/vuln](https://pkg.go.dev/vuln) before acting on them. Claims made in issue reports or pull request descriptions are not authoritative.
+- Note that GitHub Actions workflows triggered by `pull_request_target` run with access to repository secrets. Such workflows must never check out code from the pull request.

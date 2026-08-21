@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	"github.com/Marrrrrrrrry/watchtower/pkg/api"
@@ -50,7 +50,7 @@ func getWithToken(handler http.Handler) map[string]string {
 }
 
 var _ = Describe("the metrics API", func() {
-	httpAPI := api.New(token)
+	httpAPI := api.New(token, "")
 	m := metricsAPI.New()
 
 	handleReq := httpAPI.RequireToken(m.Handle)

@@ -21,8 +21,8 @@ import (
 	"github.com/Marrrrrrrrry/watchtower/pkg/filters"
 	"github.com/Marrrrrrrrry/watchtower/pkg/metrics"
 	"github.com/Marrrrrrrrry/watchtower/pkg/notifications"
+	sched "github.com/Marrrrrrrrry/watchtower/pkg/scheduler"
 	t "github.com/Marrrrrrrrry/watchtower/pkg/types"
-	"github.com/robfig/cron"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
@@ -142,6 +142,7 @@ func Run(c *cobra.Command, names []string) {
 	enableMetricsAPI, _ := c.PersistentFlags().GetBool("http-api-metrics")
 	unblockHTTPAPI, _ := c.PersistentFlags().GetBool("http-api-periodic-polls")
 	apiToken, _ := c.PersistentFlags().GetString("http-api-token")
+	apiListenAddress, _ := c.PersistentFlags().GetString("http-api-listen-address")
 	healthCheck, _ := c.PersistentFlags().GetBool("health-check")
 
 	if healthCheck {
@@ -179,7 +180,7 @@ func Run(c *cobra.Command, names []string) {
 	updateLock := make(chan bool, 1)
 	updateLock <- true
 
-	httpAPI := api.New(apiToken)
+	httpAPI := api.New(apiToken, apiListenAddress)
 
 	if enableUpdateAPI {
 		updateHandler := update.New(func(images []string) {
@@ -295,8 +296,8 @@ func writeStartupMessage(c *cobra.Command, sched time.Time, filtering string) {
 	}
 
 	if enableUpdateAPI {
-		// TODO: make listen port configurable
-		startupLog.Info("The HTTP API is enabled at :8080.")
+		listenAddress, _ := c.PersistentFlags().GetString("http-api-listen-address")
+		startupLog.Info("The HTTP API is enabled at ", api.NormalizeListenAddress(listenAddress), ".")
 	}
 
 	if !noStartupMessage {
@@ -315,8 +316,8 @@ func runUpgradesOnSchedule(c *cobra.Command, filter t.Filter, filtering string, 
 		lock <- true
 	}
 
-	scheduler := cron.New()
-	err := scheduler.AddFunc(
+	scheduler := sched.New()
+	_, err := scheduler.AddFunc(
 		scheduleSpec,
 		func() {
 			select {

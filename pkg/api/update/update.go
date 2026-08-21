@@ -40,7 +40,7 @@ func (handle *Handler) Handle(w http.ResponseWriter, r *http.Request) {
 
 	_, err := io.Copy(os.Stdout, r.Body)
 	if err != nil {
-		log.Println(err)
+		log.Error(err)
 		return
 	}
 

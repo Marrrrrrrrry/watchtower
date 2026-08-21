@@ -10,7 +10,7 @@ import (
 	"github.com/moby/moby/api/types/network"
 
 	. "github.com/Marrrrrrrrry/watchtower/internal/actions/mocks"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
