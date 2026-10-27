@@ -11,3 +11,8 @@ coverage.out
 
 docs/assets/wasm_exec.js
 docs/assets/*.wasm
+# build/test artifacts
+*.test.exe
+oryxBuildBinary
+coverage.out
+*.coverprofile
