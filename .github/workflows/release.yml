@@ -7,24 +7,25 @@ on:
       - 'v[0-9]+.[0-9]+.[0-9]+*'
       - '**/v[0-9]+.[0-9]+.[0-9]+*'
 
+
+permissions:
+  contents: read
 jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           fetch-depth: 0
       - name: Set up Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
         with:
           go-version: 1.27.3
-      - uses: dominikh/staticcheck-action@v1
-        with:
-          version: "latest"
+      - name: Run staticcheck
+        run: |
+          go tool staticcheck ./...
 
   test:
     name: Test
@@ -39,11 +40,11 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           fetch-depth: 0
       - name: Set up Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
         with:
           go-version: 1.27.3
       - name: Download modules
@@ -55,35 +56,35 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     needs: 
       - test
       - lint
     env:
       CGO_ENABLED: 0
-      TAG: ${{ github.ref_name }}
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           fetch-depth: 0
       - name: Set up Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
         with:
           go-version: 1.27.3
       - name: Login to Docker Hub
-        uses: docker/login-action@v4
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Login to GHCR
-        uses: docker/login-action@v4
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
         with:
           username: ${{ secrets.BOT_USERNAME }}
           password: ${{ secrets.BOT_GHCR_PAT }}
           registry: ghcr.io
       - name: Build
-        uses: goreleaser/goreleaser-action@v7
+        uses: goreleaser/goreleaser-action@a4f02ab5355a589de60d917a659ce617ed19b3de # v7.3.0
         with:
           version: '~> v2'
           args: release
@@ -96,7 +97,7 @@ jobs:
   #   runs-on: ubuntu-latest
   #   steps:
   #     - name: Pull new module version
-  #       uses: andrewslotin/go-proxy-pull-action@v1.3.0
+  #       uses: andrewslotin/go-proxy-pull-action@0ef95ea50ab6c03f2f095a5102bbdecad8fd7602 # v1.3.0
   #       with:
   #         goproxy: https://proxy.golang.org
   #         import_path: github.com/Marrrrrrrrry/watchtower

@@ -1,6 +1,6 @@
 name: Auto approve dependabot PRs
 
-on: pull_request_target
+on: pull_request
 
 jobs:
   auto-approve:
@@ -9,4 +9,4 @@ jobs:
       pull-requests: write
     if: github.actor == 'dependabot[bot]'
     steps:
-      - uses: hmarr/auto-approve-action@v4
+      - uses: hmarr/auto-approve-action@f0939ea97e9205ef24d872e76833fa908a770363 # v4.0.0
