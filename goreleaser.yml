@@ -77,185 +77,33 @@ archives:
         formats: [zip]
     files:
       - LICENSE.md
-dockers:
-  # Push platform image to temporary tag (for manifest use)
-  - use: buildx
-    build_flag_templates:
-      - "--platform=linux/amd64"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-    goos: linux
-    goarch: amd64
-    goarm: ''
+dockers_v2:
+  - id: watchtower
     dockerfile: dockerfiles/Dockerfile
-    image_templates:
-      - "marrrrrrrrry/watchtower:{{ .Tag }}-amd64-internal"
-      - "ghcr.io/marrrrrrrrry/watchtower:{{ .Tag }}-amd64-internal"
     ids:
       - watchtower-linux-amd64
-  - use: buildx
-    build_flag_templates:
-      - "--platform=linux/386"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-    goos: linux
-    goarch: 386
-    goarm: ''
-    dockerfile: dockerfiles/Dockerfile
-    image_templates:
-      - "marrrrrrrrry/watchtower:{{ .Tag }}-i386-internal"
-      - "ghcr.io/marrrrrrrrry/watchtower:{{ .Tag }}-i386-internal"
-    ids:
       - watchtower-linux-386
-  - use: buildx
-    build_flag_templates:
-      - "--platform=linux/arm/v7"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-    goos: linux
-    goarch: arm
-    goarm: 7
-    dockerfile: dockerfiles/Dockerfile
-    image_templates:
-      - "marrrrrrrrry/watchtower:{{ .Tag }}-armhf-internal"
-      - "ghcr.io/marrrrrrrrry/watchtower:{{ .Tag }}-armhf-internal"
-    ids:
       - watchtower-linux-armv7
-  - use: buildx
-    build_flag_templates:
-      - "--platform=linux/arm64/v8"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-    goos: linux
-    goarch: arm64
-    goarm: ''
-    dockerfile: dockerfiles/Dockerfile
-    image_templates:
-      - "marrrrrrrrry/watchtower:{{ .Tag }}-arm64v8-internal"
-      - "ghcr.io/marrrrrrrrry/watchtower:{{ .Tag }}-arm64v8-internal"
-    ids:
       - watchtower-linux-arm64
+    images:
+      - marrrrrrrrry/watchtower
+      - ghcr.io/marrrrrrrrry/watchtower
+    tags:
+      - "{{ .Tag }}"
+      - "{{ if not .Prerelease }}latest{{ end }}"
+    platforms:
+      - linux/amd64
+      - linux/386
+      - linux/arm/v7
+      - linux/arm64
+    labels:
+      org.opencontainers.image.created: "{{ .Date }}"
+      org.opencontainers.image.title: "{{ .ProjectName }}"
+      org.opencontainers.image.revision: "{{ .FullCommit }}"
+      org.opencontainers.image.version: "{{ .Version }}"
+    sbom: false
 
-  # Push latest platform image to temporary tag (for manifest use)
-  - use: buildx
-    build_flag_templates:
-      - "--platform=linux/amd64"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-    goos: linux
-    goarch: amd64
-    goarm: ''
-    dockerfile: dockerfiles/Dockerfile
-    image_templates:
-      - "marrrrrrrrry/watchtower:latest-amd64-internal"
-      - "ghcr.io/marrrrrrrrry/watchtower:latest-amd64-internal"
-    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
-    ids:
-      - watchtower-linux-amd64
-  - use: buildx
-    build_flag_templates:
-      - "--platform=linux/386"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-    goos: linux
-    goarch: 386
-    goarm: ''
-    dockerfile: dockerfiles/Dockerfile
-    image_templates:
-      - "marrrrrrrrry/watchtower:latest-i386-internal"
-      - "ghcr.io/marrrrrrrrry/watchtower:latest-i386-internal"
-    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
-    ids:
-      - watchtower-linux-386
-  - use: buildx
-    build_flag_templates:
-      - "--platform=linux/arm/v7"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-    goos: linux
-    goarch: arm
-    goarm: 7
-    dockerfile: dockerfiles/Dockerfile
-    image_templates:
-      - "marrrrrrrrry/watchtower:latest-armhf-internal"
-      - "ghcr.io/marrrrrrrrry/watchtower:latest-armhf-internal"
-    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
-    ids:
-      - watchtower-linux-armv7
-  - use: buildx
-    build_flag_templates:
-      - "--platform=linux/arm64/v8"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-    goos: linux
-    goarch: arm64
-    goarm: ''
-    dockerfile: dockerfiles/Dockerfile
-    image_templates:
-      - "marrrrrrrrry/watchtower:latest-arm64v8-internal"
-      - "ghcr.io/marrrrrrrrry/watchtower:latest-arm64v8-internal"
-    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
-    ids:
-      - watchtower-linux-arm64
-
-docker_manifests:
-  # Publish only one multi-arch tag (version), referencing temporary internal tags
-  - name_template: "marrrrrrrrry/watchtower:{{ .Tag }}"
-    image_templates:
-      - "marrrrrrrrry/watchtower:{{ .Tag }}-amd64-internal"
-      - "marrrrrrrrry/watchtower:{{ .Tag }}-i386-internal"
-      - "marrrrrrrrry/watchtower:{{ .Tag }}-armhf-internal"
-      - "marrrrrrrrry/watchtower:{{ .Tag }}-arm64v8-internal"
-    create_flags:
-      - --insecure
-    push_flags:
-      - --insecure
-  - name_template: "ghcr.io/marrrrrrrrry/watchtower:{{ .Tag }}"
-    image_templates:
-      - "ghcr.io/marrrrrrrrry/watchtower:{{ .Tag }}-amd64-internal"
-      - "ghcr.io/marrrrrrrrry/watchtower:{{ .Tag }}-i386-internal"
-      - "ghcr.io/marrrrrrrrry/watchtower:{{ .Tag }}-armhf-internal"
-      - "ghcr.io/marrrrrrrrry/watchtower:{{ .Tag }}-arm64v8-internal"
-    create_flags:
-      - --insecure
-    push_flags:
-      - --insecure
-  # Publish only one multi-arch latest tag
-  - name_template: "marrrrrrrrry/watchtower:latest"
-    image_templates:
-      - "marrrrrrrrry/watchtower:latest-amd64-internal"
-      - "marrrrrrrrry/watchtower:latest-i386-internal"
-      - "marrrrrrrrry/watchtower:latest-armhf-internal"
-      - "marrrrrrrrry/watchtower:latest-arm64v8-internal"
-    create_flags:
-      - --insecure
-    push_flags:
-      - --insecure
-    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
-  - name_template: "ghcr.io/marrrrrrrrry/watchtower:latest"
-    image_templates:
-      - "ghcr.io/marrrrrrrrry/watchtower:latest-amd64-internal"
-      - "ghcr.io/marrrrrrrrry/watchtower:latest-i386-internal"
-      - "ghcr.io/marrrrrrrrry/watchtower:latest-armhf-internal"
-      - "ghcr.io/marrrrrrrrry/watchtower:latest-arm64v8-internal"
-    create_flags:
-      - --insecure
-    push_flags:
-      - --insecure
-    skip_push: "{{ if .Prerelease }}true{{ else }}false{{ end }}"
+retry:
+  attempts: 5
+  delay: 10s
+  max_delay: 1m
