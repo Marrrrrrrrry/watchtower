@@ -41,6 +41,15 @@ func TestScheduleContract(t *testing.T) {
 
 		// additive v3 capability (v1 failed to start on these)
 		{"timezone prefix", "TZ=Europe/Rome 0 0 4 * * *", time.Date(2026, 1, 16, 3, 0, 0, 0, time.UTC), false}, // 4am CET = 3am UTC
+		{"CRON_TZ prefix", "CRON_TZ=Asia/Hong_Kong 0 0 4 * * *", time.Date(2026, 1, 15, 20, 0, 0, 0, time.UTC), false}, // 4am CST = 20:00 UTC
+
+		// "1" is the MONTH here: dom=15 + month=January, dow unrestricted
+		// → fires every January 15
+		{"every January 15", "0 0 4 15 1 *", time.Date(2027, 1, 15, 4, 0, 0, 0, time.UTC), false},
+
+		// vixie OR: when both dom and dow are restricted, either match fires
+		// (the 15th OR a Monday — 2026-01-19 is the next Monday after the ref)
+		{"dom+dow vixie OR", "0 0 4 15 * 1", time.Date(2026, 1, 19, 4, 0, 0, 0, time.UTC), false},
 
 		// rejections
 		{"too few fields", "0 4 * *", time.Time{}, true},

@@ -1,6 +1,8 @@
 package container
 
 import (
+	"strings"
+	"testing"
 	"time"
 
 	"github.com/moby/moby/api/types/network"
@@ -383,4 +385,57 @@ func havingRunningState(expected bool) gt.GomegaMatcher {
 	return WithTransform(func(container t.Container) bool {
 		return container.ContainerInfo().State.Running
 	}, Equal(expected))
+}
+
+
+func TestBelowMinAPIVersion(t *testing.T) {
+	cases := []struct {
+		ver  string
+		want bool
+	}{
+		{"", false},    // nothing negotiated or pinned yet
+		{"1.39", true}, // below the client's own floor (Docker 19.03)
+		{"1.40", true},
+		{"1.51", true},
+		{"1.52", false}, // the stated minimum (Docker Engine 29)
+		{"1.56", false},
+	}
+	for _, tc := range cases {
+		if got := belowMinAPIVersion(tc.ver); got != tc.want {
+			t.Errorf("belowMinAPIVersion(%q) = %v, want %v", tc.ver, got, tc.want)
+		}
+	}
+}
+
+
+func TestAPIVersionWarning(t *testing.T) {
+	const pinnedBelow = "Pinned Docker API version 1.44 is below the minimum supported version 1.52"
+	const negotiatedBelow = "Docker daemon API version 1.51 is below the minimum supported version 1.52"
+	cases := []struct {
+		name       string
+		pinned     string
+		negotiated string
+		pingErr    string
+		wantSub    string
+	}{
+		{"pinned at minimum, ok", "1.52", "1.56", "", ""},
+		{"pinned below minimum warns", "1.44", "1.56", "", pinnedBelow},
+		{"negotiated at minimum, ok", "", "1.52", "", ""},
+		{"negotiated below minimum warns", "", "1.51", "", negotiatedBelow},
+		{"ping failure warns with the daemon error", "", "1.56", "dial tcp 127.0.0.1:2375: connect: connection refused", "Could not negotiate daemon API version"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := apiVersionWarning(tc.pinned, tc.negotiated, tc.pingErr)
+			if tc.wantSub == "" {
+				if got != "" {
+					t.Fatalf("expected no warning for %+v, got %q", tc, got)
+				}
+				return
+			}
+			if !strings.Contains(got, tc.wantSub) {
+				t.Fatalf("warning %q does not contain %q", got, tc.wantSub)
+			}
+		})
+	}
 }

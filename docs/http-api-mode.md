@@ -52,6 +52,10 @@ The value accepts the following forms, which control which interfaces the API is
 0.0.0.0:9789     same as :9789 (an explicit form of all interfaces)
 ```
 
+The address must include a port, as in the examples above: a bare hostname (`localhost`) or a bare IPv6 address (`::1`) without a port will fail to bind at startup. IPv6 addresses additionally require the bracket form with a port (`[::1]:9789`), since a bare IPv6 address contains colons that the address parser cannot split.
+
+When running with bridge networking (the default), the API listens inside the container's network namespace: a loopback address (`127.0.0.1`, `[::1]`) is reachable only from inside the container — the published port mapping targets the container's ethernet interface and will refuse connections. Use `0.0.0.0`, or run with host networking, if the API must be reachable from the host.
+
 Changing the listen address is required when running with host networking, since port mappings such as `-p 8080:8080` have no effect in `--network host` mode and the API would otherwise always bind to port 8080 on the host:
 
 ```yaml

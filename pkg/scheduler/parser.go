@@ -5,6 +5,9 @@
 package scheduler
 
 import (
+	"fmt"
+	"strings"
+
 	log "github.com/sirupsen/logrus"
 
 	"github.com/robfig/cron/v3"
@@ -51,4 +54,27 @@ func New() *cron.Cron {
 		cron.WithParser(V1CompatibleParser()),
 		cron.WithChain(cron.Recover(logrusLogger{})),
 	)
+}
+
+// ValidateSpec pre-flights a schedule specification before it is handed to
+// AddFunc.
+//
+// Why this guard exists: robfig/cron v3.0.1 panics with a slice-bounds error
+// (parser.go:99) on a spec that is a bare "TZ=..." or "CRON_TZ=..." prefix
+// with no trailing expression — e.g. "TZ=Europe/Rome" — instead of returning
+// a parse error like v1.2.0 did for the same input. The panic escapes AddFunc
+// before any cron.Recover chain is active, so it crashes the process rather
+// than failing with a usable message. Reported upstream (robfig/cron); this
+// check converts the crash into a normal error and can be removed once a
+// fixed cron release ships.
+func ValidateSpec(spec string) error {
+	trimmed := strings.TrimSpace(spec)
+	for _, prefix := range []string{"CRON_TZ=", "TZ="} {
+		// The panic shape is the prefix with no space after it: cron's TZ
+		// branch slices the spec at the first space, which does not exist.
+		if strings.HasPrefix(trimmed, prefix) && !strings.Contains(trimmed, " ") {
+			return fmt.Errorf("invalid schedule %q: %s prefix without a schedule expression after it", spec, strings.TrimSuffix(prefix, "="))
+		}
+	}
+	return nil
 }

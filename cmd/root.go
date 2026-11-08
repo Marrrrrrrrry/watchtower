@@ -316,6 +316,10 @@ func runUpgradesOnSchedule(c *cobra.Command, filter t.Filter, filtering string, 
 		lock <- true
 	}
 
+	if err := sched.ValidateSpec(scheduleSpec); err != nil {
+		return err
+	}
+
 	scheduler := sched.New()
 	_, err := scheduler.AddFunc(
 		scheduleSpec,

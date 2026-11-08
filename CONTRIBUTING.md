@@ -3,12 +3,7 @@ To contribute code changes to this project you will need the following developme
  * [Go](https://golang.org/doc/install)
  * [Docker](https://docs.docker.com/engine/installation/)
  
-As watchtower utilizes go modules for vendor locking, you'll need at least Go 1.26.
-You can check your current version of the go language as follows:
-```bash
-  ~ $ go version
-  go version go1.26.0 darwin/amd64
-```
+The exact Go toolchain is pinned in [go.mod](go.mod). With Go 1.21+ installed, `go build` automatically downloads and uses it (GOTOOLCHAIN=auto) — no manual version management needed.
 
 
 ## Checking out the code

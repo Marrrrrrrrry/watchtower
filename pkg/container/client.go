@@ -55,25 +55,58 @@ func NewClient(opts ClientOptions) Client {
 	// Check the negotiated API version against the minimum supported one
 	// (Docker Engine 29). When DOCKER_API_VERSION is not pinned, ping the
 	// daemon to force version negotiation so the check sees the daemon's real
-	// capabilities instead of the client default. Below-minimum daemons are
-	// only warned about: watchtower historically ran down-leveled on older
-	// engines and a minor release must not lock out currently working setups.
-	if pinned := os.Getenv("DOCKER_API_VERSION"); pinned != "" {
-		if versions.LessThan(pinned, flags.DockerAPIMinVersion) {
-			log.Warnf("Pinned Docker API version %s is below the minimum supported version %s (Docker Engine 29): continuing untested, consider upgrading Docker or unsetting the pin", pinned, flags.DockerAPIMinVersion)
+	// capabilities instead of the client default. The policy (warn, never
+	// fatal — a minor release must not lock out currently working setups)
+	// lives in apiVersionWarning.
+	pinned := os.Getenv("DOCKER_API_VERSION")
+	pingErr := ""
+	if pinned == "" {
+		if _, err := cli.Ping(context.Background(), sdkClient.PingOptions{NegotiateAPIVersion: true}); err != nil {
+			pingErr = err.Error()
 		}
-	} else if _, err := cli.Ping(context.Background(), sdkClient.PingOptions{NegotiateAPIVersion: true}); err != nil {
-		// The daemon may not be reachable yet (e.g. watchtower racing the
-		// daemon on boot); requests will negotiate lazily as before.
-		log.Warnf("Could not verify daemon API version, continuing: %s", err)
-	} else if ver := cli.ClientVersion(); versions.LessThan(ver, flags.DockerAPIMinVersion) {
-		log.Warnf("Docker daemon API version %s is below the minimum supported version %s (Docker Engine 29): watchtower will run best-effort on this engine, consider upgrading Docker", ver, flags.DockerAPIMinVersion)
+	}
+	if warn := apiVersionWarning(pinned, cli.ClientVersion(), pingErr); warn != "" {
+		log.Warn(warn)
 	}
 
 	return dockerClient{
 		api:           cli,
 		ClientOptions: opts,
 	}
+}
+
+// belowMinAPIVersion reports whether a negotiated or pinned API version is
+// below the minimum supported one (DockerAPIMinVersion). An empty version
+// never warns: it means nothing was negotiated or pinned yet.
+func belowMinAPIVersion(ver string) bool {
+	return ver != "" && versions.LessThan(ver, flags.DockerAPIMinVersion)
+}
+
+// apiVersionWarning evaluates the Docker API situation and returns the
+// startup warning to log, or an empty string when the version needs no
+// comment. This is the whole version policy in one testable place:
+//
+//   - a DOCKER_API_VERSION pin is honored as an escape hatch; a pin below
+//     DockerAPIMinVersion is warned about (untested), never fatal
+//   - without a pin the version is negotiated with the daemon; a failed
+//     negotiation (daemon unreachable, or too old for this client) is warned
+//     and watchtower continues — a minor release must not lock out currently
+//     working setups
+//   - a negotiated version below DockerAPIMinVersion is likewise warned
+func apiVersionWarning(pinned, negotiated, pingErr string) string {
+	if pinned != "" {
+		if belowMinAPIVersion(pinned) {
+			return fmt.Sprintf("Pinned Docker API version %s is below the minimum supported version %s (Docker Engine 29): continuing untested, consider upgrading Docker or unsetting the pin", pinned, flags.DockerAPIMinVersion)
+		}
+		return ""
+	}
+	if pingErr != "" {
+		return fmt.Sprintf("Could not negotiate daemon API version (daemon unreachable or too old for this client), continuing: %s", pingErr)
+	}
+	if belowMinAPIVersion(negotiated) {
+		return fmt.Sprintf("Docker daemon API version %s is below the minimum supported version %s (Docker Engine 29): watchtower will run best-effort on this engine, consider upgrading Docker", negotiated, flags.DockerAPIMinVersion)
+	}
+	return ""
 }
 
 // ClientOptions contains the options for how the docker client wrapper should behave
