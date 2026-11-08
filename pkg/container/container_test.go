@@ -4,7 +4,7 @@ import (
 	"github.com/Marrrrrrrrry/watchtower/pkg/types"
 	dc "github.com/moby/moby/api/types/container"
 	"github.com/moby/moby/api/types/network"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

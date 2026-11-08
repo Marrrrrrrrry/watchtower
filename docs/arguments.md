@@ -166,13 +166,13 @@ Environment Variable: DOCKER_HOST
 ```
 
 ## Docker API version
-The API version to use by the Docker client for connecting to the Docker daemon. The minimum supported version is 1.24.
+The API version to use by the Docker client for connecting to the Docker daemon. If not set, the API version is negotiated automatically with the daemon. Setting it pins the version and disables auto-negotiation. The minimum supported version is 1.52 (Docker Engine 29).
 
 ```text
             Argument: --api-version, -a
 Environment Variable: DOCKER_API_VERSION
                 Type: String
-             Default: "1.24"
+             Default: "auto-negotiated with the daemon"
 ```
 
 ## Include restarting
@@ -343,6 +343,18 @@ Can also reference a file, in which case the contents of the file are used.
 Environment Variable: WATCHTOWER_HTTP_API_TOKEN
                 Type: String
              Default: -
+```
+
+## HTTP API listen address
+Sets the address and port that the HTTP API listens on.
+The value accepts a `host:port` pair, a `:port`, or a bare port.
+Binding to a specific interface such as `127.0.0.1:8080` keeps the API reachable only from the local machine, which is especially relevant when running with host networking.
+
+```text
+            Argument: --http-api-listen-address
+Environment Variable: WATCHTOWER_HTTP_API_LISTEN_ADDRESS
+                Type: String
+             Default: ":8080"
 ```
 
 ## HTTP API periodic polls

@@ -3,6 +3,7 @@ package container
 import (
 	"fmt"
 	"io"
+	"os"
 	"strings"
 	"time"
 
@@ -15,6 +16,7 @@ import (
 	"github.com/moby/moby/client/pkg/versions"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/Marrrrrrrrry/watchtower/internal/flags"
 	"github.com/Marrrrrrrrry/watchtower/pkg/registry"
 	"github.com/Marrrrrrrrry/watchtower/pkg/registry/digest"
 	t "github.com/Marrrrrrrrry/watchtower/pkg/types"
@@ -41,7 +43,8 @@ type Client interface {
 // The client reads its configuration from the following environment variables:
 //   - DOCKER_HOST			the docker-engine host to send api requests to
 //   - DOCKER_TLS_VERIFY		whether to verify tls certificates
-//   - DOCKER_API_VERSION	the minimum docker api version to work with
+//   - DOCKER_API_VERSION	the docker api version to use (pins the version and
+//     disables auto-negotiation)
 func NewClient(opts ClientOptions) Client {
 	cli, err := sdkClient.New(sdkClient.FromEnv)
 
@@ -49,10 +52,22 @@ func NewClient(opts ClientOptions) Client {
 		log.Fatalf("Error instantiating Docker client: %s", err)
 	}
 
-	// Verify minimum API version
-	const minAPIVersion = "1.52"
-	if ver := cli.ClientVersion(); ver != "" && versions.LessThan(ver, minAPIVersion) {
-		log.Fatalf("Docker API version too low: %s, minimum required: %s, please upgrade or set DOCKER_API_VERSION", ver, minAPIVersion)
+	// Check the negotiated API version against the minimum supported one
+	// (Docker Engine 29). When DOCKER_API_VERSION is not pinned, ping the
+	// daemon to force version negotiation so the check sees the daemon's real
+	// capabilities instead of the client default. Below-minimum daemons are
+	// only warned about: watchtower historically ran down-leveled on older
+	// engines and a minor release must not lock out currently working setups.
+	if pinned := os.Getenv("DOCKER_API_VERSION"); pinned != "" {
+		if versions.LessThan(pinned, flags.DockerAPIMinVersion) {
+			log.Warnf("Pinned Docker API version %s is below the minimum supported version %s (Docker Engine 29): continuing untested, consider upgrading Docker or unsetting the pin", pinned, flags.DockerAPIMinVersion)
+		}
+	} else if _, err := cli.Ping(context.Background(), sdkClient.PingOptions{NegotiateAPIVersion: true}); err != nil {
+		// The daemon may not be reachable yet (e.g. watchtower racing the
+		// daemon on boot); requests will negotiate lazily as before.
+		log.Warnf("Could not verify daemon API version, continuing: %s", err)
+	} else if ver := cli.ClientVersion(); versions.LessThan(ver, flags.DockerAPIMinVersion) {
+		log.Warnf("Docker daemon API version %s is below the minimum supported version %s (Docker Engine 29): watchtower will run best-effort on this engine, consider upgrading Docker", ver, flags.DockerAPIMinVersion)
 	}
 
 	return dockerClient{
@@ -205,8 +220,17 @@ func (client dockerClient) StopContainer(c t.Container, timeout time.Duration) e
 		}
 	}
 
-	// Wait for container to stop or timeout, ensuring subsequent removal won't fail
-	_ = client.waitForStopOrTimeout(c, timeout)
+	// Wait for the container to stop or timeout before removing it. An inspect
+	// error here must not abort the update: NotFound is the normal path for
+	// AutoRemove containers (the daemon removes them once stopped), and any
+	// other daemon error is surfaced by the forceful removal below.
+	if err := client.waitForStopOrTimeout(c, timeout); err != nil {
+		if errdefs.IsNotFound(err) {
+			log.Debugf("Container %s was removed while waiting for it to stop", shortID)
+		} else {
+			log.Warnf("Failed waiting for container %s to stop: %s", shortID, err)
+		}
+	}
 
 	if c.ContainerInfo().HostConfig.AutoRemove {
 		log.Debugf("AutoRemove container %s, skipping ContainerRemove call.", shortID)

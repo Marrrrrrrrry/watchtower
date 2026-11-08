@@ -3,23 +3,44 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 )
 
 const tokenMissingMsg = "api token is empty or has not been set. exiting"
 
+// DefaultListenAddress is the address the HTTP API listens on when no other
+// address is configured.
+const DefaultListenAddress = ":8080"
+
 // API is the http server responsible for serving the HTTP API endpoints
 type API struct {
-	Token       string
-	hasHandlers bool
+	Token         string
+	ListenAddress string
+	hasHandlers   bool
 }
 
 // New is a factory function creating a new API instance
-func New(token string) *API {
+func New(token string, listenAddress string) *API {
 	return &API{
-		Token:       token,
-		hasHandlers: false,
+		Token:         token,
+		ListenAddress: NormalizeListenAddress(listenAddress),
+		hasHandlers:   false,
+	}
+}
+
+// NormalizeListenAddress turns a bare port such as "8080" into ":8080" as
+// expected by http.ListenAndServe, defaults an empty address to
+// DefaultListenAddress, and leaves "host:port" values untouched.
+func NormalizeListenAddress(address string) string {
+	switch {
+	case address == "":
+		return DefaultListenAddress
+	case !strings.Contains(address, ":"):
+		return ":" + address
+	default:
+		return address
 	}
 }
 
@@ -62,15 +83,15 @@ func (api *API) Start(block bool) error {
 	}
 
 	if block {
-		runHTTPServer()
+		api.runHTTPServer()
 	} else {
 		go func() {
-			runHTTPServer()
+			api.runHTTPServer()
 		}()
 	}
 	return nil
 }
 
-func runHTTPServer() {
-	log.Fatal(http.ListenAndServe(":8080", nil))
+func (api *API) runHTTPServer() {
+	log.Fatal(http.ListenAndServe(api.ListenAddress, nil))
 }

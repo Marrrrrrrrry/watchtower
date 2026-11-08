@@ -3,7 +3,7 @@ package mocks
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/onsi/ginkgo"
+	"github.com/onsi/ginkgo/v2"
 	"net/http"
 	"net/url"
 	"os"
